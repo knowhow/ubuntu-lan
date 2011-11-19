@@ -1,0 +1,4 @@
+locales locales/default_environment_locale select de_DE.UTF-8
+locales locales/locales_to_be_generated multiselect de_DE.UTF-8 UTF-8, en_US.UTF-8 UTF-8
+keyboard-configuration keyboard-configuration/xkb-keymap select de
+keyboard-configuration keyboard-configuration/layoutcode string de

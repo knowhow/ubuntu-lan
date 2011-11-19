@@ -1,0 +1,7 @@
+#!/bin/bash
+#
+set -e
+
+fcopy -r /etc/bind/
+
+ainsl $target/etc/bind/named.conf.local "include \"/etc/bind/localzones\";"

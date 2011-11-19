@@ -1,0 +1,13 @@
+#!/bin/bash
+
+## Add a local user account:
+if [ ! -z $USERNAME ] && ! $ROOTCMD getent passwd $USERNAME ; then
+    $ROOTCMD adduser --disabled-login \
+	--gecos "local system administrator" $USERNAME
+    $ROOTCMD usermod --password "$ROOTPW" $USERNAME
+    $ROOTCMD usermod --groups adm,sudo  $USERNAME
+fi
+
+## Make debian-lan-scripts available:
+
+fcopy -r -m root,root,0700 /usr/sbin/

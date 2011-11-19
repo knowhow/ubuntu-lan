@@ -1,0 +1,184 @@
+#!/bin/bash
+#
+# Manage users, pricipals and keytabs
+#
+
+set -e
+
+DATADIR="/root/installation/"
+#KADMINOPTION="-force"
+HOSTNAME=`hostname -s`
+HOME="/lan/$HOSTNAME/home0"
+
+usage(){
+    echo "Usage: debian-lan  command  argument"
+    echo
+    echo "Where \"command  argument\" can be one of the following:"
+    echo
+    echo "  adduser (list|file)" 
+    echo "   \"list\" is a list of user (login) names.  If instead a file"
+    echo "   is provided, it must contain lines of the form 'name [password]'."
+    echo "   If the password is omitted, a random password will be generated and"
+    echo "   appended to the corresponding login name in the file given."
+    echo
+    echo "  deluser (list|file)"
+    echo "   \"list\" is a list of user (login) names.  If instead a file"
+    echo "   is provided, the first word in each lines is taken as a login name."
+    echo
+    echo "  purgehomes age"
+    echo "   \"age\" is the number of days since the (former) user has been deleted."
+    echo
+    echo "  addmachine list"    
+    echo "   \"list\" is a list of host names."
+    echo
+    exit 1
+}
+
+nscd_restart(){
+    if pidof nscd 1>&2 > /dev/null ; then
+	## Restart nscd to have database up to date: 
+	/etc/init.d/nscd restart
+    fi
+}
+
+adduserLDAP(){
+    echo "Creating LDAP account for \"$1\": " 
+    if ! getent group $1 > /dev/null ; then
+        ldapaddgroup $1
+    else
+	echo "Group \"$1\" already exists!"
+    fi
+    if ! getent passwd $1 > /dev/null ; then
+	ldapadduser  $1 $1
+    else
+	echo "User \"$1\" already exists!"
+    fi
+}
+
+deluserLDAP(){
+    if getent passwd $1 ; then
+	## First, fetch user's home directory and tagg it for removal:
+	HOMEDIR=`getent passwd $1 | awk -F : '{print $6}'`
+	RM_HOMEDIR=`dirname $HOMEDIR`"/rm_"`date "+%Y%m%d"`"_"`basename $HOMEDIR`
+	echo "Tagging $1's home directory $HOMEDIR for removal:"
+	if mv -v $HOMEDIR $RM_HOMEDIR;  then 
+	    chown root:root $RM_HOMEDIR
+	    chmod go-rwx $RM_HOMEDIR
+	else
+	    echo "ERROR: Tagging $1's home directory failed!"
+	fi
+	## Then, remove user from LDAP:
+	echo "Deleting LDAP account for \"$1\": " 
+	ldapdeleteuser  $1 || true
+	ldapdeletegroup $1 || true
+    else
+	echo "User \"$1\" not found in LDAP database!"
+    fi
+}
+
+##############################
+
+if [ $# -lt 2 ] ; then
+    usage
+fi
+
+COMMAND=$1
+shift
+
+case $COMMAND in
+    adduser)
+	nscd_restart
+	if [ -r $1 ] ; then
+	    ## We have a file, one user per line.
+	    chmod 600 $1
+	    cat $1 | while read LINE; do
+		if [ ! -z "$LINE" ] && echo $LINE | grep -qv "^#" ; then 
+		    USERID=`echo $LINE | awk '{print $1}'`
+		    PWD=`echo $LINE | awk '{print $2}'`
+		    if [ -z $PWD ] ;  then
+			PWD=`slappasswd -g`
+			sed -i "s#$USERID#$USERID ${PWD}#" $1
+		    fi
+		    echo "---------------- $USERID ----------------"
+		    adduserLDAP $USERID
+		    USERDN="dn=uid=$USERID,ou=people,dc=intern"
+		    kadmin.local -q "add_principal -pw ${PWD} -x $USERDN $USERID"
+		fi
+	    done
+	    echo
+	    echo "   =========== IMPORTANT NOTICE ==========="
+	    echo "Make sure to keep $1 save or remove it!"
+	    echo "    Advice users to change their password "
+	    echo "    immediately using the kpasswd command."
+	    echo "   ========================================"
+	else
+	    ## List of users on the command line.
+	    echo "Creating accounts for: \"$@\"" 
+	    for USERID in $@ ; do 
+		echo "---------------- $USERID ----------------"
+		adduserLDAP $USERID
+		USERDN="dn=uid=$USERID,ou=people,dc=intern"
+		kadmin.local -q "add_principal -x $USERDN $USERID"
+	    done
+	fi
+	;;
+    deluser)
+	nscd_restart
+	if [ -r $1 ] ; then
+	    ## We have a file, one user per line.
+	    cat $1 | while read LINE; do
+		if [ ! -z "$LINE" ] && echo $LINE | grep -qv "^#" ; then 
+		    USERID=`echo $LINE | awk '{print $1}'`
+		    echo "---------------- $USERID ----------------"
+		    ## re-redirect standard input for kadmin:
+		    kadmin.local -q "delete_principal $KADMINOPTION $USERID" <&2 || true
+		    deluserLDAP $USERID
+		fi
+	    done
+	else
+	    echo "Deleting accounts for: \"$@\"" 
+	    for USERID in $@ ; do
+		echo "---------------- $USERID ----------------"
+		kadmin.local -q "delete_principal $USERID" || true
+		deluserLDAP $USERID
+	    done
+	fi
+	;;
+    purgehomes)
+	MAXAGE_DAYS=$1
+	MAXAGE_SEC=$(( $MAXAGE_DAYS*24*60*60 ))
+	echo "Scanning all home directories tagged, remove them if older than $MAXAGE_DAYS days:"
+	for DIR in `find $HOME -maxdepth 1 -type d -regextype posix-egrep -regex ".*/rm_[0-9]{8}_[^/]+"` ; do
+	    RMDATE=`echo $DIR | sed "s/.*rm_\([0-9]\{8\}\)_.*/\1/"`
+	    AGE=$(( `date +"%s"`-`date +"%s" -d $RMDATE` )) 
+	    AGE_DAYS=$(( $AGE/24/60/60 )) 
+	    if [ $AGE -gt $MAXAGE_SEC ] ; then
+		rm -rf $DIR
+		echo "Home directory $DIR purged, $AGE_DAYS days old."
+	    else
+		echo "Not purging $DIR, $AGE_DAYS days old."
+	    fi
+	done
+	;;
+    addmachine)
+	for MACHINE in $@ ; do
+	    scp $DATADIR/${MACHINE}.keytab root@${MACHINE}:/etc/krb5.keytab
+	    MUNIN_CONFDIR='/etc/munin/munin-conf.d/'
+	    if [ -d $MUNIN_CONFDIR ] && ! grep -sq ${MACHINE} $MUNIN_CONFDIR/nodes.conf ;  then
+		cat >> $MUNIN_CONFDIR/nodes.conf <<EOF
+[${MACHINE}.intern]
+     address ${MACHINE}
+
+EOF
+		echo "${MACHINE} will be monitored by munin from now on. "
+	    else
+		echo "$MUNIN_CONFDIR does not exist. "
+		echo "${MACHINE} will not be monitored by munin. "
+	    fi		
+        done
+	echo
+	;;
+    *)
+	usage
+	;;
+esac

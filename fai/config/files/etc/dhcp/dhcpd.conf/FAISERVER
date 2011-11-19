@@ -1,0 +1,45 @@
+# dhcpd.conf for SETUP_A
+
+option dhcp-max-message-size 2048; 
+use-host-decl-names on;
+
+option routers 10.0.0.1;
+option domain-name "intern";
+option domain-name-servers 10.0.0.1;
+option ntp-servers ntp;
+
+subnet 10.0.0.0 netmask 255.255.0.0 {
+   allow unknown-clients;
+   range 10.0.1.10 10.0.1.200;
+}
+
+group {
+   server-name faiserver;
+   next-server faiserver;
+   filename "fai/pxelinux.0";
+   host workstation00 {hardware ethernet 52:54:00:b7:f1:38;  fixed-address 10.0.0.10;}
+   host workstation01 {hardware ethernet 52:54:00:35:53:88;  fixed-address 10.0.0.11;}
+   host workstation02 {hardware ethernet 1:2:3:4:5:2;  fixed-address 10.0.0.12;}
+   host workstation03 {hardware ethernet 1:2:3:4:5:3;  fixed-address 10.0.0.13;}
+   host workstation04 {hardware ethernet 1:2:3:4:5:4;  fixed-address 10.0.0.14;}
+   host workstation05 {hardware ethernet 1:2:3:4:5:5;  fixed-address 10.0.0.15;}
+   host workstation06 {hardware ethernet 1:2:3:4:5:6;  fixed-address 10.0.0.16;}
+   host workstation07 {hardware ethernet 1:2:3:4:5:7;  fixed-address 10.0.0.17;}
+   host workstation08 {hardware ethernet 1:2:3:4:5:8;  fixed-address 10.0.0.18;}
+   host workstation09 {hardware ethernet 1:2:3:4:5:9;  fixed-address 10.0.0.19;}
+   host workstation10 {hardware ethernet 1:2:3:4:5:10; fixed-address 10.0.0.20;}
+   host workstation11 {hardware ethernet 1:2:3:4:5:11; fixed-address 10.0.0.21;}
+   host workstation12 {hardware ethernet 1:2:3:4:5:12; fixed-address 10.0.0.22;}
+   host workstation13 {hardware ethernet 1:2:3:4:5:13; fixed-address 10.0.0.23;}
+   host workstation14 {hardware ethernet 1:2:3:4:5:14; fixed-address 10.0.0.24;}
+   host workstation15 {hardware ethernet 1:2:3:4:5:15; fixed-address 10.0.0.25;}
+   host workstation16 {hardware ethernet 1:2:3:4:5:16; fixed-address 10.0.0.26;}
+   host workstation17 {hardware ethernet 1:2:3:4:5:17; fixed-address 10.0.0.27;}
+   host workstation18 {hardware ethernet 1:2:3:4:5:18; fixed-address 10.0.0.28;}
+   host workstation19 {hardware ethernet 1:2:3:4:5:19; fixed-address 10.0.0.29;}
+}
+
+# generate more lines with:
+# perl -e 'for (1..25) {printf "host atom%02s {hardware ethernet XXX:$_;fixed-address atom%02s;}\n",$_,$_;}'
+# replace 1:2:3:4:5:XX with the hardware addresses of your clients
+

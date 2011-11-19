@@ -1,0 +1,24 @@
+PACKAGES aptitude
+lxde
+lxtask
+desktop-base
+
+gnome-session
+gnome-applets
+#gnome-desktop-environment
+#gnome
+
+gdm
+menu
+#arduino
+eog
+evince
+gcalctool
+gnome-screenshot
+iceweasel
+inkscape
+gimp
+openoffice.org  # FIXME libreoffice 
+anacron
+krb5-auth-dialog
+unattended-upgrades

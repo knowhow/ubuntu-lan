@@ -1,0 +1,12 @@
+#!/bin/bash
+
+fcopy -r /etc/fai
+
+if [ $FAI_ACTION = "install" ]; then
+    fcopy  /etc/dhcp/dhcpd.conf
+    if $FAISETUP ; then
+	fcopy  /etc/rc.local
+    fi
+    # Use the same sources.list for server and clients:
+    cp -va $target/etc/apt/sources.list $target/etc/fai/apt/ 
+fi

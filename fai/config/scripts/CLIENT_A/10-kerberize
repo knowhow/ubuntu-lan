@@ -1,0 +1,13 @@
+#!/usr/sbin/cfagent -f
+
+control:
+   any::
+   actionsequence = ( editfiles )
+   EditFileSize = ( 30000 )
+
+editfiles:
+   any::
+	{ ${target}/etc/ssh/sshd_config
+	  ## Kerberize ssh: 
+	  ReplaceAll "#GSSAPIAuthentication no" With "GSSAPIAuthentication yes"
+	}

@@ -1,0 +1,16 @@
+################### Kerberos #######################
+dn: cn=kerberos,dc=intern
+objectClass: krbContainer
+cn: kerberos
+
+dn: cn=kdc-service,cn=kerberos,dc=intern
+objectClass: organizationalRole
+objectClass: simpleSecurityObject
+cn: kdc-service
+userPassword: @KDC_SERVICE_PW_HASH@
+
+dn: cn=kadmin-service,cn=kerberos,dc=intern
+objectClass: organizationalRole
+objectClass: simpleSecurityObject
+cn: kadmin-service
+userPassword: @KDC_SERVICE_PW_HASH@

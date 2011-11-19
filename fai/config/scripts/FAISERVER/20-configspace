@@ -1,0 +1,13 @@
+#!/bin/bash
+
+set -e
+
+if [ $FAI_ACTION == "install" ] ; then 
+    ## Copy the config space to the faiserver:
+    echo -n "Cleaning config space ... "
+    rm -rf $target/srv/fai/config
+    echo "done."
+    
+    cp -a /var/lib/fai/config $target/srv/fai/
+    echo "New config space copied to faiserver."
+fi

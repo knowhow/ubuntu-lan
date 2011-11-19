@@ -1,0 +1,11 @@
+## Only list packages that are essential for the LOG_SERVER class.
+## Put all setup-dependent packages in the SETUP_* class.
+PACKAGES aptitude
+apache2
+munin
+
+## FIXME: Installing munin-node gives problems with /etc/init.d/nis #612481
+#munin-node
+
+smartmontools
+lm-sensors

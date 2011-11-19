@@ -1,0 +1,4 @@
+#!/bin/bash
+
+ainsl $target/etc/exports "/srv/fai/nfsroot  10.0.0.0/24(async,ro,no_subtree_check,no_root_squash)"
+ainsl $target/etc/exports "/srv/fai/config  10.0.0.0/24(async,ro,no_subtree_check,no_root_squash)"

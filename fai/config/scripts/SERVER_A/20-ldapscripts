@@ -1,0 +1,25 @@
+#!/usr/sbin/cfagent -f
+
+control:
+   any::
+   actionsequence = ( editfiles )
+   EditFileSize = ( 30000 )
+
+editfiles:
+   any::
+	{ ${target}/etc/ldapscripts/ldapscripts.conf
+	  ReplaceAll '#SERVER="ldap://localhost"' With 'SERVER="ldapi://"'
+	  ReplaceAll '#BINDDN="cn=Manager,dc=example,dc=com"' With 'BINDDN="cn=admin,dc=intern"'
+	  ReplaceAll '#BINDPWDFILE=' With 'BINDPWDFILE='
+
+	  ReplaceAll '#SUFFIX="dc=example,dc=com"' With 'SUFFIX="dc=intern"'
+	  ReplaceAll '#GSUFFIX="ou=Groups"'        With 'GSUFFIX="ou=groups"'
+	  ReplaceAll '#USUFFIX="ou=Users"' 	   With 'USUFFIX="ou=people"'
+
+	  ReplaceAll '#UHOMES="/home/%u"' With 'UHOMES="/lan/mainserver/home0/%u"'
+	  ReplaceAll 'CREATEHOMES="no"'   With 'CREATEHOMES="yes"'
+
+	  ## Do not generate a posix password, use kerberos instead:
+	  HashCommentLinesStarting 'PASSWORDGEN='
+	}
+

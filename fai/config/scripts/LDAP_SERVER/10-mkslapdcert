@@ -1,0 +1,30 @@
+#!/bin/bash
+
+set -e
+
+CERTCONFIG="/etc/ldap/ssl/slapd-cert.cnf"
+PRIVATKEY="/etc/ldap/ssl/slapd-key.pem"
+CERTIFICATE="/etc/ldap/ssl/slapd-cert.pem"
+PRIVKEYCERT="/etc/ldap/ssl/slapd.pem"
+
+if [ -f $PRIVATKEY ] ; then 
+    echo "Private key already exists, exiting."
+    exit 0
+fi
+
+fcopy $CERTCONFIG
+
+$ROOTCMD openssl req -new -x509 -nodes -sha1 -config $CERTCONFIG -days 3650 \
+      -out $CERTIFICATE -keyout $PRIVATKEY
+
+$ROOTCMD cat $PRIVATKEY $CERTIFICATE > $target$PRIVKEYCERT
+
+$ROOTCMD chown openldap:openldap $PRIVKEYCERT
+$ROOTCMD chmod 600 $PRIVKEYCERT
+$ROOTCMD chmod 600 $PRIVATKEY
+
+ifclass FAISERVER || exit 0
+
+## Add the LDAP certificate to the fai config space:
+$ROOTCMD mkdir -pv /srv/fai/config/files/${CERTIFICATE}/
+$ROOTCMD cp -v $CERTIFICATE /srv/fai/config/files/${CERTIFICATE}/LDAP_CLIENT

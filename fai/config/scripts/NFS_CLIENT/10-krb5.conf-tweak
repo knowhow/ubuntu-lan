@@ -1,0 +1,16 @@
+#! /usr/sbin/cfagent -f
+
+control:
+   any::
+   actionsequence = ( editfiles )
+   EditFileSize = ( 30000 )
+
+editfiles:
+    any::
+      { ${target}/etc/krb5.conf
+      	## FIXME: Needed for NFSv4 because of #521878:
+        BeginGroupIfNoSuchLine '        allow_weak_crypto = true'
+          LocateLineMatching '.*\[libdefaults\].*'
+          InsertLine '        allow_weak_crypto = true'
+        EndGroup
+      }	

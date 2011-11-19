@@ -1,0 +1,54 @@
+$TTL 500
+@               IN      SOA     mainserver.intern. root.postoffice.intern. (
+                                1 ; Serialnumber
+                                3600    ; Refresh
+                                1800    ; Retry
+                                720000  ; Expire
+                                6400 )  ; Minimum TTL
+                        NS      mainserver.intern.
+                        MX      10 mainserver.intern.
+mainserver              A       10.0.0.1
+_ldap._tcp              SRV     100 0 389 mainserver.intern.
+_syslog._udp            SRV     100 0 514 mainserver.intern.
+_kerberos._udp          SRV     100 0 88  mainserver.intern.
+_kerberos-adm._tcp      SRV     100 0 749 mainserver.intern.
+_kpasswd._udp           SRV     100 0 464 mainserver.intern.
+ns                      CNAME   mainserver.intern.
+www                     CNAME   mainserver.intern.
+ntp                     CNAME   mainserver.intern.
+webcache                CNAME   mainserver.intern.
+cfengine                CNAME   mainserver.intern.
+sitesummary             CNAME   mainserver.intern.
+bootps                  CNAME   mainserver.intern.
+homes                   CNAME   mainserver.intern.
+wpad                    CNAME   mainserver.intern.
+db                      CNAME   mainserver.intern.
+backup                  CNAME   mainserver.intern.
+ssh                     CNAME   mainserver.intern.
+ltsp                    CNAME   mainserver.intern.
+domain                  CNAME   mainserver.intern.
+ldap                    CNAME   mainserver.intern.
+kerberos                CNAME   mainserver.intern.
+postoffice              CNAME   mainserver.intern.
+syslog                  CNAME   mainserver.intern.
+faiserver               CNAME   mainserver.intern.
+workstation00           A       10.0.0.10
+workstation01           A       10.0.0.11
+workstation02           A       10.0.0.12
+workstation03           A       10.0.0.13
+workstation04           A       10.0.0.14
+workstation05           A       10.0.0.15
+workstation06           A       10.0.0.16
+workstation07           A       10.0.0.17
+workstation08           A       10.0.0.18
+workstation09           A       10.0.0.19
+workstation10           A       10.0.0.20
+workstation11           A       10.0.0.21
+workstation12           A       10.0.0.22
+workstation13           A       10.0.0.23
+workstation14           A       10.0.0.24
+workstation15           A       10.0.0.25
+workstation16           A       10.0.0.26
+workstation17           A       10.0.0.27
+workstation18           A       10.0.0.28
+workstation19           A       10.0.0.29

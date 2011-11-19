@@ -1,0 +1,189 @@
+#!/bin/bash
+#
+set -e
+
+if [ -f /var/lib/ldap/__db.001 ] ;  then
+    echo "The LDAP data base is not empty, stopping. "
+    echo "To initialize a brand new LDAP+KDC: "
+    echo "rm /var/lib/ldap/__db* /var/lib/ldap/*.bdb"
+    echo "rm /etc/krb5kdc/stash /etc/krb5.keytab*"
+    exit 0
+fi
+
+LDIFS="/etc/ldap/root.ldif /etc/ldap/krb5.ldif /etc/ldap/autofs.ldif"
+
+## Copy files in place:
+for file in $LDIFS /etc/ldap/slapd.conf; do
+    fcopy -m openldap,openldap,660 $file 
+done
+
+## Kerberos schema:
+$ROOTCMD gunzip -c /usr/share/doc/krb5-kdc-ldap/kerberos.schema.gz > \
+    $target/etc/ldap/schema/kerberos.schema
+
+## Create $DATADIR:
+mkdir -p $target$DATADIR
+
+copy_example_DB_CONFIG() {
+## Function to set a DB_CONFIG, ripped from slapd.postinst.
+## Copy an example DB_CONFIG file:
+        local directory srcdir
+        directory="$1"
+        srcdir="/usr/share/slapd"
+        if ! [ -f "${target}${directory}/DB_CONFIG" ] && [ -d "$target$directory" ]; then
+            $ROOTCMD cp $srcdir/DB_CONFIG "${directory}/DB_CONFIG"
+        fi
+}
+
+## Init LDAP tree
+init_LDAP () {
+    $ROOTCMD rm -f /var/lib/ldap/*
+    copy_example_DB_CONFIG /var/lib/ldap
+    
+    if [ -z $LDAP_ADMIN_PW ] ;  then
+	LDAP_ADMIN_PW=`$ROOTCMD slappasswd -g -h {CLEARTEXT}`
+	PWFILE="$DATADIR/LDAPadminPWD"
+	echo -n $LDAP_ADMIN_PW > $target$PWFILE
+	echo "Random LDAP admin password saved in ${PWFILE}."
+    fi
+    PWFILE="/etc/ldapscripts/ldapscripts.passwd"
+    echo -n $LDAP_ADMIN_PW > $target$PWFILE
+    $ROOTCMD chmod -v 0600 $PWFILE
+    LDAP_ADMIN_PW_HASH=`$ROOTCMD slappasswd -v -s $LDAP_ADMIN_PW -h {SSHA}`
+
+    #### Kerberos KDC service principals:
+    KDCCONFDIR="/etc/krb5kdc/"
+    KEYFILE="service.keyfile"
+    KDC_SERVICE_PW=`$ROOTCMD slappasswd -g -h {CLEARTEXT}`
+    ## convert to {HEX} and {SSHA} encoding:
+    KDC_SERVICE_PW_HASH=`$ROOTCMD slappasswd -v -s $KDC_SERVICE_PW -h {SSHA}`
+    KDC_SERVICE_PW_HEX=`echo $KDC_SERVICE_PW | xxd -g0 -ps | sed "s/0a$//"`
+    KRB_CONT_DN=`$ROOTCMD awk '/dn: cn=kerberos,/ { print $2 }' /etc/ldap/krb5.ldif`
+    $ROOTCMD touch $KDCCONFDIR$KEYFILE
+    $ROOTCMD chmod -v 0600 $KDCCONFDIR$KEYFILE
+    cat > $target$KDCCONFDIR$KEYFILE <<EOF
+cn=kdc-service,$KRB_CONT_DN#{HEX}$KDC_SERVICE_PW_HEX
+cn=kadmin-service,$KRB_CONT_DN#{HEX}$KDC_SERVICE_PW_HEX
+EOF
+    
+  ## bootstrap ldap with passwords inserted:
+    
+    for ldif in $LDIFS; do
+	if $ROOTCMD cat $ldif | $ROOTCMD sed \
+	    -e "s:@LDAP_ADMIN_PW_HASH@:$LDAP_ADMIN_PW_HASH:" \
+	    -e "s:@KDC_SERVICE_PW_HASH@:$KDC_SERVICE_PW_HASH:" \
+	    | $ROOTCMD /usr/sbin/slapadd ; then
+	    echo "Info: added '$ldif' to ldap database."
+	else
+	    echo "Error: Unable to load '$ldif'"
+	    exit 1
+	fi
+    done
+    $ROOTCMD chown -Rv openldap:openldap /var/lib/ldap
+}
+
+## Init Kerberos KDC
+init_KDC() {
+    PID=`pidof slapd || /bin/true`
+    if [ -z "$PID" ]; then
+	echo "Error: the ldap server is not running. Skipping KDC setup."
+	exit 1
+    else
+	echo "Start initializing KDC: "
+    fi
+
+    DN_LDAP_ADMIN=`$ROOTCMD awk '/^dn: cn=admin,/ {print $2}' /etc/ldap/root.ldif`
+    DN_KRB_CONT=`$ROOTCMD awk '/^dn: cn=kerberos,/ {print $2}' /etc/ldap/krb5.ldif`
+    DN_KDC="cn=kdc-service,$DN_KRB_CONT"
+    DN_KADMIN="cn=kadmin-service,$DN_KRB_CONT"
+    STASHFILE="/etc/krb5kdc/stash"
+
+    echo "Using '$DN_LDAP_ADMIN' and '$DN_KRB_CONT' for KDC setup."
+
+    if [ -z $KDC_MASTER_PW ] ;  then
+	KDC_MASTER_PW=`$ROOTCMD slappasswd -g -h {CLEARTEXT}`
+	PWFILE="$DATADIR/KDCmasterPWD"
+	echo -n $KDC_MASTER_PW > $target$PWFILE
+	echo "Random Kerberos KDC master password saved in ${PWFILE}."
+    fi
+
+    fcopy /etc/krb5.conf
+    $ROOTCMD sed -i s:@DN_KRB_CONT@:$DN_KRB_CONT:g /etc/krb5.conf
+    $ROOTCMD sed -i s:@DN_KDC@:$DN_KDC:g /etc/krb5.conf
+    $ROOTCMD sed -i s:@DN_KADMIN@:$DN_KADMIN:g /etc/krb5.conf
+    fcopy /etc/krb5kdc/kdc.conf
+    fcopy /etc/krb5kdc/kadm5.acl
+
+    ## create kerberos subtree in ldap database:
+    $ROOTCMD kdb5_ldap_util -s -D $DN_LDAP_ADMIN -w $LDAP_ADMIN_PW \
+	create -subtrees dc=intern -H ldapi:// -P $KDC_MASTER_PW
+
+    ## create default policy:
+    $ROOTCMD kadmin.local -q "add_policy -minlength 4 -minclasses 2 default"
+
+    ## needs root or kdc passwd:
+    $ROOTCMD kadmin.local -q "addprinc -pw $LDAP_ADMIN_PW root/admin"
+    $ROOTCMD kadmin.local -q "addprinc -pw $LDAP_ADMIN_PW root"
+
+    ## Create machine principals and add them to the keytab:
+    $ROOTCMD kadmin.local -q "addprinc -randkey host/mainserver.intern"
+    $ROOTCMD kadmin.local -q "ktadd host/mainserver.intern"
+
+    ## Create service principals and add them to the keytab:
+    $ROOTCMD kadmin.local -q "addprinc -randkey nfs/mainserver.intern"
+    $ROOTCMD kadmin.local -q "ktadd nfs/mainserver.intern"
+
+    for i in `seq 0 1` ; do
+	for j in `seq 0 9` ; do
+	    ## NFS principal:
+	    $ROOTCMD kadmin.local -q "addprinc -randkey nfs/workstation${i}${j}.intern"
+	    $ROOTCMD kadmin.local -q "ktadd -k $DATADIR/workstation${i}${j}.keytab nfs/workstation${i}${j}.intern"
+	    ## Host principal:
+	    $ROOTCMD kadmin.local -q "addprinc -randkey host/workstation${i}${j}.intern"
+	    $ROOTCMD kadmin.local -q "ktadd -k $DATADIR/workstation${i}${j}.keytab host/workstation${i}${j}.intern"
+	done
+    done
+
+    ## does ldap.intern also work?
+    $ROOTCMD kadmin.local -q "addprinc -randkey ldap/mainserver.intern"
+    $ROOTCMD kadmin.local -q "ktadd -k /etc/krb5.keytab.ldap ldap/mainserver.intern"
+    $ROOTCMD chown -v openldap:openldap /etc/krb5.keytab.ldap
+
+    echo "Initializing KDC finished. "
+}
+
+start_slapd () {
+    ## check if slapd is running:
+    PID=`pidof slapd || /bin/true`
+    if [ -z "$PID" ]; then
+	echo "The ldap server slapd is not running. Trying to start slapd."
+	if [ -x $target/sbin/start-stop-daemon.distrib ] ; then
+            ## needed to start slapd during installation:
+	    $ROOTCMD mv -v /sbin/start-stop-daemon /sbin/start-stop-daemon.FAKE
+	    $ROOTCMD cp -v /sbin/start-stop-daemon.distrib /sbin/start-stop-daemon
+	    start_stop_daemon_moved=true
+	else
+	    echo "Error: No start-stop-daemon.distrib available. "
+	    echo "'ls /sbin/start-stop-daemon*' gives: "
+	    $ROOTCMD ls /sbin/start-stop-daemon*
+	fi
+	$ROOTCMD /etc/init.d/slapd start
+    fi
+}
+
+stop_slapd () {
+    $ROOTCMD /etc/init.d/slapd stop
+    if [ true = "$start_stop_daemon_moved" ] && \
+	[ -x $target/sbin/start-stop-daemon.distrib ] ; then
+	$ROOTCMD mv -v /sbin/start-stop-daemon.FAKE /sbin/start-stop-daemon
+    fi
+}
+
+#####################
+
+init_LDAP
+start_slapd
+init_KDC
+stop_slapd
+
+exit 0

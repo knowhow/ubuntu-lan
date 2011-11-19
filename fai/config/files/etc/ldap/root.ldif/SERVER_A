@@ -1,0 +1,27 @@
+############### Root of tree amd admin ##############
+dn: dc=intern
+objectClass: top
+objectClass: dcObject
+objectClass: labeledURIObject
+ObjectClass: organization
+description: Debian-LAN
+dc: intern
+o: Debian-LAN
+labeledURI: http://www/ LDAP for Debian-LAN
+
+dn: cn=admin,dc=intern
+objectClass: organizationalRole
+objectClass: simpleSecurityObject
+cn: admin
+description: LDAP Administrator
+userPassword: @LDAP_ADMIN_PW_HASH@
+
+dn: ou=people,dc=intern
+objectClass: top
+objectClass: organizationalUnit
+ou: people
+
+dn: ou=groups,dc=intern
+objectClass: top
+objectClass: organizationalUnit
+ou: groups

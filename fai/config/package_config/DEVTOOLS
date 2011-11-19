@@ -1,0 +1,4 @@
+## Optional packages for development.
+PACKAGES aptitude
+emacs
+lsof

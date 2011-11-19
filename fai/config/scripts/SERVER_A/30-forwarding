@@ -1,0 +1,12 @@
+#!/usr/sbin/cfagent -f
+
+control:
+   any::
+   actionsequence = ( editfiles )
+   EditFileSize = ( 30000 )
+
+editfiles:
+   any::
+	{ ${target}/etc/sysctl.conf
+	  ReplaceAll "#net.ipv4.ip_forward=1" With "net.ipv4.ip_forward=1" 
+	}

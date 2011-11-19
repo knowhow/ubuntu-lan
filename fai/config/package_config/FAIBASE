@@ -1,0 +1,24 @@
+PACKAGES aptitude
+fai-client
+cfengine2
+cron
+debconf-utils
+file
+hdparm
+less
+linuxlogo
+nfs-common
+nscd
+rsync
+openssh-client openssh-server
+strace
+tcsh
+time
+procinfo
+exim4
+eject
+locales
+console-common
+pciutils usbutils
+lvm2
+bsd-mailx

@@ -1,0 +1,34 @@
+#!/usr/sbin/cfagent -f
+
+control:
+   any::
+   actionsequence = ( editfiles )
+   EditFileSize = ( 300000 )
+
+editfiles:
+   any::
+	{ ${target}/etc/adzapper.conf
+	  ## Configure adzapper: 
+	  ReplaceAll 'ZAP_MODE=""' With 'ZAP_MODE="CLEAR"'
+	}
+
+	{ ${target}/etc/squid3/squid.conf
+	  ## Define url_rewrite_program:
+	  BeginGroupIfNoSuchLine "url_rewrite_program /usr/bin/adzapper.wrapper"
+	     LocateLineMatching "#  TAG: url_rewrite_program"
+	     InsertLine "url_rewrite_program /usr/bin/adzapper.wrapper"
+	  EndGroup
+
+	  ## Comment if dansguardian is used (only allow access from localhost): 
+	  ReplaceAll "#acl localnet src 10.0.0.0/8" With "acl localnet src 10.0.0.0/8"
+	  BeginGroupIfNoSuchLine "http_access allow localnet"
+	    LocateLineMatching "http_access allow localhost"
+	    InsertLine "http_access allow localnet"
+	  EndGroup
+	}
+
+## Uncomment if dansguardian is used: 
+#	{ ${target}/etc/dansguardian/dansguardian.conf
+#	  ## Configure dansguardian: 
+#	  ReplaceAll "^UNCONFIGURED" With "#UNCONFIGURED"
+#	}

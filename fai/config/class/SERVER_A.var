@@ -1,0 +1,45 @@
+# Default values for installation SERVER_A.
+
+# allow installation of packages from unsigned repositories
+FAI_ALLOW_UNSIGNED=0
+
+CONSOLEFONT=
+KEYMAP=us-latin1
+
+# Set UTC=yes if your system clock is set to UTC (GMT), and UTC=no if not.
+UTC=yes
+TIMEZONE=Europe/Berlin
+
+# Local user and root password for the new installed linux system
+USERNAME="localadmin"
+# Use: 'mkpasswd -Hsha-256 <PASSWORD>' to create the password hash
+# pw is "123":
+ROOTPW='$5$1bCKX.c.x29$jz18.yheofg56Pmjav9GJEQCygrZeju8Fqa3LgV04U2'
+
+## All sensible data will end up here (see below): 
+DATADIR=/root/installation/
+
+## The Kerberos KDC master password in clear text (!).  If undefined
+## or empty, a random password will be created and saved in $DATADIR.
+KDC_MASTER_PW=
+
+## The password for the LDAP admin and root's principals in clear
+## text (!!!).  If undefined or empty, a random password will be
+## created and saved in $DATADIR.
+LDAP_ADMIN_PW=
+
+## Run fai-setup and some other initializations on first boot.  
+## See 'files/etc/rc.local'.
+FAISETUP=true
+
+# MODULESLIST contains modules that will be loaded by the new system,
+# not during installation these modules will be written to /etc/modules
+# If you need a module during installation, add it to $kernelmodules
+# in 20-hwdetect.source. But discover should do most of this job
+MODULESLIST="usbkbd ehci-hcd ohci-hcd uhci-hcd usbhid psmouse"
+
+# erros in tasks greater than this value will cause the installation to stop
+STOP_ON_ERROR=700
+
+# use the new partitioning tool
+USE_SETUP_STORAGE=1

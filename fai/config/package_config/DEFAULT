@@ -1,0 +1,26 @@
+PACKAGES aptitude-r I386
+linux-image-686
+memtest86+
+
+PACKAGES aptitude CHROOT
+linux-image-686-
+linux-image-amd64-
+
+PACKAGES aptitude-r AMD64
+linux-image-amd64
+memtest86+
+
+PACKAGES aptitude XEN
+xen-linux-system-2.6.26-2-xen-amd64
+
+PACKAGES aptitude DHCPC
+isc-dhcp-client
+
+PACKAGES aptitude GRUB
+grub lilo-
+
+PACKAGES aptitude GRUB_PC
+grub-pc grub- lilo-
+
+PACKAGES aptitude LILO
+lilo grub-

@@ -1,0 +1,31 @@
+#! /bin/bash
+
+set -e
+
+## Setup script run at boot time.
+## Removed after successful execution. 
+
+echo "Creating the nfsroot for FAI."
+
+. /etc/fai/fai.conf
+. /etc/fai/make-fai-nfsroot.conf
+
+if [ ! -d "$FAI_CONFIGDIR/class" ]; then
+    mkdir -p $FAI_CONFIGDIR
+    cp -a /usr/share/doc/fai-doc/examples/simple/* $FAI_CONFIGDIR
+fi
+
+URL=`echo $FAI_DEBOOTSTRAP | awk '{print $2}'`
+## Check if package repository is accessible:     
+if wget --quiet --output-document=/tmp/fai-setup $URL ; then
+    fai-setup -ev 2>&1 | tee /var/log/fai-setup.log
+    echo "Log files are saved to /var/log/fai-setup.log"
+    ## Create pxelinux boot configuration for workstation*:
+    for i in `seq 0 1` ; do
+	for j in `seq 0 9` ; do
+	    fai-chboot -IFv workstation$i$j 
+	done
+    done
+    ## remove me, things are prepared now:
+    mv -v /etc/rc.local.pre_fcopy $0
+fi
