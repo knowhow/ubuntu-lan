@@ -1,7 +1,7 @@
 # Default values for installation SERVER_A.
 
 # allow installation of packages from unsigned repositories
-FAI_ALLOW_UNSIGNED=0
+FAI_ALLOW_UNSIGNED=1
 
 CONSOLEFONT=
 KEYMAP=us-latin1
