@@ -172,8 +172,7 @@ case $COMMAND in
 EOF
 		echo "${MACHINE} will be monitored by munin from now on. "
 	    else
-		echo "$MUNIN_CONFDIR does not exist. "
-		echo "${MACHINE} will not be monitored by munin. "
+		echo "$MUNIN_CONFDIR does not exist or machine already present in $MUNIN_CONFDIR/nodes.conf. "
 	    fi		
         done
 	echo
