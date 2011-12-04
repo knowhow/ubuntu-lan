@@ -7,5 +7,6 @@ set -e
 
 ## Example:  Configure PAM to add users to the dialout group (needed
 ## to access /dev/tty*): 
-ainsl -q $target/etc/security/group.conf "gdm;*;*;Al0000-2400;dialout"
-ainsl -q $target/etc/pam.d/gdm "auth    optional        pam_group.so"
+
+ainsl -q $target/etc/security/group.conf "gdm3;*;*;Al0000-2400;dialout"
+ainsl -q $target/etc/pam.d/gdm3 "auth    optional        pam_group.so"

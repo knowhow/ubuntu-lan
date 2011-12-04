@@ -8,7 +8,7 @@ gnome-applets
 #gnome-desktop-environment
 #gnome
 
-gdm
+gdm3
 menu
 #arduino
 eog
