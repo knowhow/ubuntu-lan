@@ -1,0 +1,4 @@
+#!/bin/bash
+
+## Switch apache userdir module on:
+$ROOTCMD a2enmod userdir

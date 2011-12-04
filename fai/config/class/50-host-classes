@@ -35,7 +35,9 @@ case $HOSTNAME in
     mainserver)
 	echo "FAIBASE FAISERVER $MAINSERVER_A" ;;
     workstation*)
-	echo "FAIBASE DHCPC $WORKSTATION_A XORG DESKTOP GERMAN" ;;
+	## You might want to add some localization class like:
+	# echo "FAIBASE DHCPC $WORKSTATION_A XORG DESKTOP GERMAN" ;;
+	echo "FAIBASE DHCPC $WORKSTATION_A XORG DESKTOP" ;;
     *)
 	echo "FAIBASE DHCPC" ;;
 esac
