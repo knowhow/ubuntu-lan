@@ -13,7 +13,7 @@ disk_config lvm
 
 ## use 'vda5' for virtual disks:
 vg  vg_system  vda5
-vg_system-root  /      500M-     ext3  errors=remount-ro
+vg_system-root  /      500M-10G  ext3  errors=remount-ro
 vg_system-usr   /usr   3G-20G    ext3  defaults 
 vg_system-var   /var   1G-       ext3  defaults
 

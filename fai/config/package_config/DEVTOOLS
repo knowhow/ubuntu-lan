@@ -1,4 +1,14 @@
 ## Optional packages for development.
 PACKAGES aptitude
+## General purpose:
 emacs
+git
+
+## Diagnostics:
+gbd
 lsof
+ltrace
+nmap
+
+## LDAP:
+ldap-utils

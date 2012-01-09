@@ -18,12 +18,11 @@ fi
 URL=`echo $FAI_DEBOOTSTRAP | awk '{print $2}'`
 ## Check if package repository is accessible:     
 if wget --quiet --output-document=/tmp/fai-setup $URL ; then
-    fai-setup -ev 2>&1 | tee /var/log/fai-setup.log
-    echo "Log files are saved to /var/log/fai-setup.log"
+    fai-setup -e
     ## Create pxelinux boot configuration for workstation*:
     for i in `seq 0 1` ; do
 	for j in `seq 0 9` ; do
-	    fai-chboot -IFv workstation$i$j 
+	    fai-chboot -IFv workstation$i$j  2>&1 | tee /var/log/fai/fai-chboot.log 
 	done
     done
     ## remove me, things are prepared now:
