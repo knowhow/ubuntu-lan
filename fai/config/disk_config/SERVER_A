@@ -1,20 +1,11 @@
-## use 'sda' for real hardware:
-#disk_config  sda  fstabkey:uuid
-
-## use 'vda' for virtual disks:
-disk_config  vda  fstabkey:uuid
+disk_config  disk1  fstabkey:uuid
 primary  /boot       64-256    ext3    rw
 primary  swap        64-2096   swap    sw
 logical  -           0-        -       -
 
 disk_config lvm
-## use 'sda5' for real hardware:
-#vg  vg_system  sda5
-
-## use 'vda5' for virtual disks:
-vg  vg_system  vda5
+vg  vg_system  disk1.5
 vg_system-root  /      1G-2G     ext3  errors=remount-ro
-vg_system-usr   /usr   2G-20G    ext3  defaults 
+vg_system-usr   /usr   2G-20G    ext3  defaults
 vg_system-var   /var   1G-20G    ext3  defaults
 vg_system-home  /lan/mainserver/home0  2G-       ext3  defaults
-
