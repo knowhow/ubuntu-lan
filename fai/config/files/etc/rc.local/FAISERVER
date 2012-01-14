@@ -5,6 +5,11 @@ set -e
 ## Setup script run at boot time.
 ## Removed after successful execution. 
 
+echo "The nfsroot for FAI may be created by $0 at boot time. "
+echo "To enable, remove the line marked in $0. " 
+# Remove to enable: 
+exit 0
+
 echo "Creating the nfsroot for FAI."
 
 . /etc/fai/fai.conf
@@ -18,7 +23,7 @@ fi
 URL=`echo $FAI_DEBOOTSTRAP | awk '{print $2}'`
 ## Check if package repository is accessible:     
 if wget --quiet --output-document=/tmp/fai-setup $URL ; then
-    fai-setup -e
+    fai-setup -e -v
     ## Create pxelinux boot configuration for workstation*:
     for i in `seq 0 1` ; do
 	for j in `seq 0 9` ; do

@@ -6,7 +6,6 @@ debconf-utils
 file
 hdparm
 less
-linuxlogo
 nfs-common
 nscd
 rsync
