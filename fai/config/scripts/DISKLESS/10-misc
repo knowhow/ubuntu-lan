@@ -1,0 +1,12 @@
+#!/bin/sh
+
+fcopy -v /etc/resolv.conf
+fcopy -v /etc/hosts
+
+## FIXME remove this as soon as not needed anymore:
+# set root password
+#echo "root:$ROOTPW" | $ROOTCMD chpasswd --encrypted
+$ROOTCMD usermod -p "$ROOTPW" root
+# make /root accessible only by root
+chmod 0700 $target/root
+chown root:root $target/root

@@ -1,0 +1,45 @@
+PACKAGES aptitude
+## FIXME: needed because the pxe kernel is 486 
+linux-image-486
+
+lxde
+lxtask
+desktop-base
+
+gnome-session
+gnome-applets
+#gnome-desktop-environment
+#gnome
+
+gdm3
+menu
+#arduino
+eog
+evince
+gcalctool
+gnome-screenshot
+iceweasel
+inkscape
+gimp
+openoffice.org  # FIXME libreoffice 
+krb5-auth-dialog
+
+## From FAIBASE:
+fai-client
+cfengine2
+debconf-utils
+file
+less
+nfs-common
+nscd
+rsync
+openssh-client
+strace
+time
+procinfo
+exim4
+eject
+locales
+console-common
+pciutils usbutils
+bsd-mailx
