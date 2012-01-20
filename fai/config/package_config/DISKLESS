@@ -1,6 +1,5 @@
 PACKAGES aptitude
-## FIXME: needed because the pxe kernel is 486 
-linux-image-486
+nbd-client
 
 lxde
 lxtask

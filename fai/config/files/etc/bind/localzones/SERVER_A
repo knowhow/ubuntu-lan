@@ -1,7 +1,7 @@
-zone "10.in-addr.arpa." {
+zone "10.in-addr.arpa" {
         type master;
         notify yes;
-        file "/etc/bind/db.10.in-addr.arpa.";
+        file "/etc/bind/db.10.in-addr.arpa";
         
         
 };

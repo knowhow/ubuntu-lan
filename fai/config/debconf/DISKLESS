@@ -7,3 +7,9 @@ xserver-xorg xserver-xorg/autodetect_monitor boolean false
 xserver-xorg xserver-xorg/autodetect_keyboard boolean true
 xserver-xorg xserver-xorg/autodetect_mouse boolean true
 xserver-xorg xserver-xorg/autodetect_video_card boolean true
+nbd-client nbd-client/killall boolean false
+nbd-client nbd-client/device string /dev/nbd0
+nbd-client nbd-client/host string swapserver
+nbd-client nbd-client/port string 9572
+nbd-client nbd-client/type select swap
+nbd-client nbd-client/number string 1

@@ -5,6 +5,8 @@ set -e
 ## Setup script run at boot time.
 ## Removed after successful execution. 
 
+echo
+echo "======================================================="
 echo "The nfsroot for FAI may be created by $0 at boot time. "
 echo "To enable, remove the line marked in $0. " 
 # Remove to enable: 
