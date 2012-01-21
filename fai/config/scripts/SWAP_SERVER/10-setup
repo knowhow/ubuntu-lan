@@ -1,7 +1,0 @@
-#!/bin/bash
-
-fcopy -m root,root,755 /usr/sbin/nbdswapd
-
-$ROOTCMD update-inetd --add "9572 stream tcp nowait nobody /usr/sbin/tcpd /usr/sbin/nbdswapd"
-
-ainsl $target/etc/hosts.allow "nbdswapd: ALL: keepalive"

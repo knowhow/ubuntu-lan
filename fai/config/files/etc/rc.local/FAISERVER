@@ -5,12 +5,17 @@ set -e
 ## Setup script run at boot time.
 ## Removed after successful execution. 
 
-echo
-echo "======================================================="
-echo "The nfsroot for FAI may be created by $0 at boot time. "
-echo "To enable, remove the line marked in $0. " 
+############################
 # Remove to enable: 
+echo
+echo "====================================================================="
+echo "The nfsroot for FAI may be created by executing $0."
+echo "This can be done at boot time or manually."
+echo "To enable, remove the lines marked in $0 and"
+echo "reboot or execute $0."
+echo "====================================================================="
 exit 0
+###########################
 
 echo "Creating the nfsroot for FAI."
 
@@ -27,7 +32,7 @@ URL=`echo $FAI_DEBOOTSTRAP | awk '{print $2}'`
 if wget --quiet --output-document=/tmp/fai-setup $URL ; then
     fai-setup -e -v
     ## Create pxelinux boot configuration for workstation*:
-    for i in `seq 0 1` ; do
+    for i in `seq 0 9` ; do
 	for j in `seq 0 9` ; do
 	    fai-chboot -IFv workstation$i$j  2>&1 | tee /var/log/fai/fai-chboot.log 
 	done

@@ -10,4 +10,4 @@ fi
 
 ## Make debian-lan-scripts available:
 
-fcopy -r -m root,root,0700 /usr/sbin/
+fcopy -m root,root,0700 /usr/sbin/debian-lan

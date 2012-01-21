@@ -133,7 +133,7 @@ init_KDC() {
     $ROOTCMD kadmin.local -q "addprinc -randkey nfs/mainserver.intern"
     $ROOTCMD kadmin.local -q "ktadd nfs/mainserver.intern"
 
-    for i in `seq 0 1` ; do
+    for i in `seq 0 9` ; do
 	for j in `seq 0 9` ; do
 	    ## NFS principal:
 	    $ROOTCMD kadmin.local -q "addprinc -randkey nfs/workstation${i}${j}.intern"

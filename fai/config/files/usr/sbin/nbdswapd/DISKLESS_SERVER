@@ -4,14 +4,13 @@
 
 ## swap file and size (in MB):
 SWAP=$(mktemp)
-SIZE=$"128"
+SIZE="128"
 
 ## create swap file:
 dd if=/dev/zero of=$SWAP bs=1024k count=0 seek=$SIZE 2> /dev/null
-/sbin/mkswap $SWAP > /dev/null 2>&1
 
 ## start nbd-server:
-PATH=/usr/bin:/bin:$PATH nbd-server 0 $SWAP -C /dev/null > /dev/null 2>&1
+nbd-server 0 $SWAP -C /dev/null > /dev/null 2>&1
 
 ## remove swap file:
 rm -f $SWAP

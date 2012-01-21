@@ -1,0 +1,28 @@
+#!/bin/sh
+#
+# modifications needed on the server to boot the diskless client
+#
+
+set -e
+
+TEMPLATE=/srv/tftp/fai/pxelinux.cfg/diskless.tmpl
+
+if [ ! -e $TEMPLATE ]; then
+    KERNEL=`basename $(ls /srv/tftp/fai/vmlinuz*)`
+    INITRD=`basename $(ls /srv/tftp/fai/initrd.img*)`
+
+    echo "Creating template with $KERNEL and $INITRD."
+    cat > $TEMPLATE <<EOF
+# template for diskless
+default fai-generated
+
+label fai-generated
+kernel $KERNEL
+append initrd=$INITRD ip=dhcp root=/dev/nfs nfsroot=/opt boot=live
+EOF
+else
+
+    echo "The template $TEMPLATE existes already!"
+fi
+
+fai-chboot -vc diskless default

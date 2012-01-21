@@ -39,7 +39,7 @@ case $HOSTNAME in
 	# echo "FAIBASE DHCPC $WORKSTATION_A XORG DESKTOP GERMAN" ;;
 	echo "FAIBASE DHCPC $WORKSTATION_A XORG DESKTOP" ;;
     diskless)
-        echo "$WORKSTATION_A XORG DISKLESS"
+        echo "$WORKSTATION_A XORG DISKLESS_CLIENT"
         ## skip GRUB_PC below:
         exit 0 ;;
     *)
