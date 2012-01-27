@@ -4,7 +4,7 @@
 
 ## swap file and size (in MB):
 SWAP=$(mktemp)
-SIZE="128"
+SIZE="64"
 
 ## create swap file:
 dd if=/dev/zero of=$SWAP bs=1024k count=0 seek=$SIZE 2> /dev/null

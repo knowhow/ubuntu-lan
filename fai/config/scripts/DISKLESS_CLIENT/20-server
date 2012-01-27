@@ -22,7 +22,7 @@ append initrd=$INITRD ip=dhcp root=/dev/nfs nfsroot=/opt boot=live
 EOF
 else
 
-    echo "The template $TEMPLATE existes already!"
+    echo "The template $TEMPLATE exists already!"
 fi
 
 fai-chboot -vc diskless default

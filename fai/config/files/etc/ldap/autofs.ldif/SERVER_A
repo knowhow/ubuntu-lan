@@ -39,4 +39,4 @@ ou: auto.mainserver
 dn: cn=/,ou=auto.mainserver,ou=automount,dc=intern
 objectClass: automount
 cn: /
-automountInformation: -fstype=nfs4,sec=sys,tcp,rsize=32768,wsize=32768,rw,intr,hard,nodev,nosuid mainserver.intern:/&
+automountInformation: -fstype=nfs4,sec=krb5i,tcp,rsize=32768,wsize=32768,rw,intr,hard,nodev,nosuid mainserver.intern:/&

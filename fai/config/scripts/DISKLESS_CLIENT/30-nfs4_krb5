@@ -1,0 +1,25 @@
+#!/bin/sh
+#
+set -e
+
+FILE=${target}/usr/share/libpam-script/pam_script_auth
+
+ainsl ${target}/etc/default/nfs-common 'RPCGSSDOPTS="-n"'  
+ainsl ${target}/etc/pam.d/common-auth  'auth    optional  pam_script.so' 
+
+cat > $FILE <<EOF
+#!/bin/sh
+#
+set -e
+if [ \$PAM_USER = "root" ] || ls /tmp/krb5cc_diskless > /dev/null 2>&1; then
+    exit 0
+fi
+
+FILE=/tmp/krb5cc_diskless
+cp -v /tmp/krb5cc_pam_* \$FILE
+/etc/init.d/autofs restart > /dev/null
+
+exit 0
+EOF
+
+chmod 0755 $FILE

@@ -1,5 +1,6 @@
 PACKAGES aptitude
 nbd-client
+libpam-script
 
 lxde
 lxtask
