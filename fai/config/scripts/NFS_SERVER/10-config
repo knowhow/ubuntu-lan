@@ -25,9 +25,9 @@ editfiles:
 	}
 
 	{ ${target}/etc/exports
-	  ## NFS4 without the need to use kerberos for now:
-	  AppendIfNoSuchLine "/srv/nfs4  10.0.0.0/24(sec=krb5p:krb5i:krb5:sys,rw,sync,fsid=0,crossmnt,no_subtree_check)"
-	  AppendIfNoSuchLine "/srv/nfs4/home0  10.0.0.0/24(sec=krb5p:krb5i:krb5:sys,rw,sync,no_subtree_check)"
+	  ## kerberized NFS4:
+	  AppendIfNoSuchLine "/srv/nfs4        10.0.0.0/8(sec=krb5p:krb5i,rw,sync,fsid=0,crossmnt,no_subtree_check)"
+	  AppendIfNoSuchLine "/srv/nfs4/home0  10.0.0.0/8(sec=krb5p:krb5i,rw,sync,no_subtree_check)"
 	}
 
 	{ ${target}/etc/fstab
