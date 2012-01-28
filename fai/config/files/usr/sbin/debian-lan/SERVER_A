@@ -9,6 +9,7 @@ DATADIR="/root/installation/"
 #KADMINOPTION="-force"
 HOSTNAME=`hostname -s`
 HOME="/lan/$HOSTNAME/home0"
+DHCPCONF="/etc/dhcp/dhcpd.conf"
 
 usage(){
     echo "Usage: debian-lan  command  argument"
@@ -30,6 +31,10 @@ usage(){
     echo
     echo "  addmachine list"    
     echo "   \"list\" is a list of host names."
+    echo
+    echo "  add2dhcp workstation|diskless"    
+    echo "   All nonlocal hardware MAC addresses found in the syslog are added"
+    echo "   to '$DHCPCONF', either as workstation or diskless machine."
     echo
     exit 1
 }
@@ -177,6 +182,23 @@ EOF
         done
 	echo
 	;;
+    add2dhcp)
+	NAME=$1
+	locHW=`ifconfig -a | grep -o "\w\{2\}:\w\{2\}:\w\{2\}:\w\{2\}:\w\{2\}:\w\{2\}"`
+	allHW=`grep -o "\w\{2\}:\w\{2\}:\w\{2\}:\w\{2\}:\w\{2\}:\w\{2\}" /var/log/syslog | sort -u`
+	for HWaddr in $allHW ; do
+	    if echo $locHW | grep -q $HWaddr ; then
+		echo "Skipping local MAC address: ${HWaddr}."
+		continue
+	    elif grep -q $HWaddr $DHCPCONF; then
+		echo "Foreign MAC address $HWaddr already found in '${DHCPCONF}'."
+	    else
+		sed -i "0,/\(host ${NAME}.*\) A1:B2:C3:D4:E5:\w\{2\};/s//\1 ${HWaddr};/" ${DHCPCONF}
+		echo "Adding foreign MAC address $HWaddr to '${DHCPCONF}'."
+	    fi
+	done
+	;;
+    
     *)
 	usage
 	;;
