@@ -12,5 +12,6 @@ editfiles:
         BeginGroupIfNoSuchLine '        allow_weak_crypto = true'
           LocateLineMatching '.*\[libdefaults\].*'
           InsertLine '        allow_weak_crypto = true'
+          InsertLine '        permitted_enctypes = des-cbc-crc'
         EndGroup
       }	
