@@ -1,0 +1,4 @@
+function FindProxyForURL(url, host) 
+{
+        return "PROXY webcache:3128; DIRECT";
+}
