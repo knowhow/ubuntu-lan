@@ -188,15 +188,20 @@ EOF
 	allHW=`grep -o "\w\{2\}:\w\{2\}:\w\{2\}:\w\{2\}:\w\{2\}:\w\{2\}" /var/log/syslog | sort -u`
 	for HWaddr in $allHW ; do
 	    if echo $locHW | grep -q $HWaddr ; then
-		echo "Skipping local MAC address: ${HWaddr}."
+		echo "Skipping local MAC address: ${HWaddr}"
 		continue
 	    elif grep -q $HWaddr $DHCPCONF; then
-		echo "Foreign MAC address $HWaddr already found in '${DHCPCONF}'."
+		echo "MAC address $HWaddr already in ${DHCPCONF}"
 	    else
-		sed -i "0,/\(host ${NAME}.*\) A1:B2:C3:D4:E5:\w\{2\};/s//\1 ${HWaddr};/" ${DHCPCONF}
-		echo "Adding foreign MAC address $HWaddr to '${DHCPCONF}'."
+		read -e -n 1 -p "Add ${HWaddr} to ${DHCPCONF} [Y|n]?  " inp
+		inp=${inp:-Y}
+		if [ $inp = "Y" ] || [ $inp = "y" ] ; then
+		    sed -i "0,/\(host ${NAME}.*\) A1:B2:C3:D4:E5:\w\{2\};/s//\1 ${HWaddr};/" ${DHCPCONF}
+		    echo "MAC address $HWaddr added."
+		fi
 	    fi
 	done
+	/etc/init.d/isc-dhcp-server restart
 	;;
     
     *)
