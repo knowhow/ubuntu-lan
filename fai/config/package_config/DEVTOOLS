@@ -1,14 +1,19 @@
 ## Optional packages for development.
-PACKAGES aptitude
+PACKAGES aptitude-r
 ## General purpose:
 emacs
 git
+gitk
 
 ## Diagnostics:
 gbd
 lsof
 ltrace
 nmap
+
+## Documentation
+#texlive
+#auctex
 
 ## LDAP:
 ldap-utils
