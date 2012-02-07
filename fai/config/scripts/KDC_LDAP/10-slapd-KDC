@@ -2,6 +2,27 @@
 #
 set -e
 
+LDIFS="/etc/ldap/root.ldif /etc/ldap/krb5.ldif /etc/ldap/autofs.ldif"
+
+## Copy files in place, but no modifications in softupdate mode:
+for file in $LDIFS /etc/ldap/slapd.conf; do
+    fcopy -U -m openldap,openldap,660 $file
+done
+
+DN_KRB_CONT=`$ROOTCMD awk '/^dn: cn=kerberos,/ {print $2}' /etc/ldap/krb5.ldif`
+DN_KDC="cn=kdc-service,$DN_KRB_CONT"
+DN_KADMIN="cn=kadmin-service,$DN_KRB_CONT"
+
+## We might want to change a configuration after installation,
+## so distribute the corresponding files in any case:
+fcopy /etc/krb5.conf
+$ROOTCMD sed -i s:@DN_KRB_CONT@:$DN_KRB_CONT:g /etc/krb5.conf
+$ROOTCMD sed -i s:@DN_KDC@:$DN_KDC:g /etc/krb5.conf
+$ROOTCMD sed -i s:@DN_KADMIN@:$DN_KADMIN:g /etc/krb5.conf
+fcopy /etc/krb5kdc/kdc.conf
+fcopy /etc/krb5kdc/kadm5.acl
+
+## Stop now, if LDAP database is already present:
 if [ -f /var/lib/ldap/__db.001 ] ;  then
     echo "The LDAP data base is not empty, stopping. "
     echo "To initialize a brand new LDAP+KDC: "
@@ -10,19 +31,14 @@ if [ -f /var/lib/ldap/__db.001 ] ;  then
     exit 0
 fi
 
-LDIFS="/etc/ldap/root.ldif /etc/ldap/krb5.ldif /etc/ldap/autofs.ldif"
-
-## Copy files in place:
-for file in $LDIFS /etc/ldap/slapd.conf; do
-    fcopy -m openldap,openldap,660 $file 
-done
-
 ## Kerberos schema:
 $ROOTCMD gunzip -c /usr/share/doc/krb5-kdc-ldap/kerberos.schema.gz > \
     $target/etc/ldap/schema/kerberos.schema
 
 ## Create $DATADIR:
 mkdir -p $target$DATADIR
+
+##########################################################################
 
 copy_example_DB_CONFIG() {
 ## Function to set a DB_CONFIG, ripped from slapd.postinst.
@@ -93,9 +109,6 @@ init_KDC() {
     fi
 
     DN_LDAP_ADMIN=`$ROOTCMD awk '/^dn: cn=admin,/ {print $2}' /etc/ldap/root.ldif`
-    DN_KRB_CONT=`$ROOTCMD awk '/^dn: cn=kerberos,/ {print $2}' /etc/ldap/krb5.ldif`
-    DN_KDC="cn=kdc-service,$DN_KRB_CONT"
-    DN_KADMIN="cn=kadmin-service,$DN_KRB_CONT"
     STASHFILE="/etc/krb5kdc/stash"
 
     echo "Using '$DN_LDAP_ADMIN' and '$DN_KRB_CONT' for KDC setup."
@@ -106,13 +119,6 @@ init_KDC() {
 	echo -n $KDC_MASTER_PW > $target$PWFILE
 	echo "Random Kerberos KDC master password saved in ${PWFILE}."
     fi
-
-    fcopy /etc/krb5.conf
-    $ROOTCMD sed -i s:@DN_KRB_CONT@:$DN_KRB_CONT:g /etc/krb5.conf
-    $ROOTCMD sed -i s:@DN_KDC@:$DN_KDC:g /etc/krb5.conf
-    $ROOTCMD sed -i s:@DN_KADMIN@:$DN_KADMIN:g /etc/krb5.conf
-    fcopy /etc/krb5kdc/kdc.conf
-    fcopy /etc/krb5kdc/kadm5.acl
 
     ## create kerberos subtree in ldap database:
     $ROOTCMD kdb5_ldap_util -s -D $DN_LDAP_ADMIN -w $LDAP_ADMIN_PW \
