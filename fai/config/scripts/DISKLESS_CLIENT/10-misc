@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 fcopy -v /etc/resolv.conf
 fcopy -v /etc/hosts

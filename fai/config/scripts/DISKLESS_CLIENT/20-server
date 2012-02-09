@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # modifications needed on the server to boot the diskless client
 #
