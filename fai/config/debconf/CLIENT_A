@@ -1,4 +1,0 @@
-nslcd nslcd/ldap-base string dc=intern
-nslcd nslcd/ldap-uris string ldap://ldap
-nslcd nslcd/ldap-starttls boolean true
-nslcd nslcd/ldap-reqcert select allow

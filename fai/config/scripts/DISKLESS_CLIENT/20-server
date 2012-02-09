@@ -1,11 +1,11 @@
-#!/bin/sh
+#!/bin/bash
 #
 # modifications needed on the server to boot the diskless client
 #
 
 set -e
 
-if [ $FAI_ACTION == "install" ] ; then
+if [ $FAI_ACTION == "dirinstall" ] ; then
     TEMPLATE=/srv/tftp/fai/pxelinux.cfg/diskless.tmpl
 
     if [ ! -e $TEMPLATE ]; then
