@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Manage users, pricipals and keytabs
+# Manage users, pricipals and keytabs.  Add machines to dhcpd.conf.
 #
 
 set -e
@@ -12,11 +12,12 @@ HOME="/lan/$HOSTNAME/home0"
 DHCPCONF="/etc/dhcp/dhcpd.conf"
 
 usage(){
-    echo "Usage: debian-lan  command  argument"
+    echo "Usage: debian-lan  adduser|deluser|purgehomes|addmachine  argument"
+    echo "       debian-lan  add2dhcp"
     echo
-    echo "Where \"command  argument\" can be one of the following:"
+    echo "The corresponding argument can be one of the following:"
     echo
-    echo "  adduser (list|file)" 
+    echo "  adduser (list|file)"
     echo "   \"list\" is a list of user (login) names.  If instead a file"
     echo "   is provided, it must contain lines of the form 'name [password]'."
     echo "   If the password is omitted, a random password will be generated and"
@@ -29,11 +30,11 @@ usage(){
     echo "  purgehomes age"
     echo "   \"age\" is the number of days since the (former) user has been deleted."
     echo
-    echo "  addmachine list"    
+    echo "  addmachine list"
     echo "   \"list\" is a list of host names."
     echo
-    echo "  add2dhcp workstation|diskless"    
-    echo "   All nonlocal hardware MAC addresses found in the syslog are added"
+    echo "  add2dhcp"
+    echo "   All non-local hardware MAC addresses found in the syslog may be added"
     echo "   to '$DHCPCONF', either as workstation or diskless machine."
     echo
     exit 1
@@ -41,13 +42,13 @@ usage(){
 
 nscd_restart(){
     if pidof nscd 1>&2 > /dev/null ; then
-	## Restart nscd to have database up to date: 
+	## Restart nscd to have database up to date:
 	/etc/init.d/nscd restart
     fi
 }
 
 adduserLDAP(){
-    echo "Creating LDAP account for \"$1\": " 
+    echo "Creating LDAP account for \"$1\": "
     if ! getent group $1 > /dev/null ; then
         ldapaddgroup $1
     else
@@ -66,14 +67,14 @@ deluserLDAP(){
 	HOMEDIR=`getent passwd $1 | awk -F : '{print $6}'`
 	RM_HOMEDIR=`dirname $HOMEDIR`"/rm_"`date "+%Y%m%d"`"_"`basename $HOMEDIR`
 	echo "Tagging $1's home directory $HOMEDIR for removal:"
-	if mv -v $HOMEDIR $RM_HOMEDIR;  then 
+	if mv -v $HOMEDIR $RM_HOMEDIR;  then
 	    chown root:root $RM_HOMEDIR
 	    chmod go-rwx $RM_HOMEDIR
 	else
 	    echo "ERROR: Tagging $1's home directory failed!"
 	fi
 	## Then, remove user from LDAP:
-	echo "Deleting LDAP account for \"$1\": " 
+	echo "Deleting LDAP account for \"$1\": "
 	ldapdeleteuser  $1 || true
 	ldapdeletegroup $1 || true
     else
@@ -83,12 +84,12 @@ deluserLDAP(){
 
 ##############################
 
-if [ $# -lt 2 ] ; then
-    usage
-fi
-
 COMMAND=$1
 shift
+
+if [ $# -lt 1 ] && [ $COMMAND != "add2dhcp" ] ; then
+    usage
+fi
 
 case $COMMAND in
     adduser)
@@ -97,7 +98,7 @@ case $COMMAND in
 	    ## We have a file, one user per line.
 	    chmod 600 $1
 	    cat $1 | while read LINE; do
-		if [ ! -z "$LINE" ] && echo $LINE | grep -qv "^#" ; then 
+		if [ ! -z "$LINE" ] && echo $LINE | grep -qv "^#" ; then
 		    USERID=`echo $LINE | awk '{print $1}'`
 		    PWD=`echo $LINE | awk '{print $2}'`
 		    if [ -z $PWD ] ;  then
@@ -118,8 +119,8 @@ case $COMMAND in
 	    echo "   ========================================"
 	else
 	    ## List of users on the command line.
-	    echo "Creating accounts for: \"$@\"" 
-	    for USERID in $@ ; do 
+	    echo "Creating accounts for: \"$@\""
+	    for USERID in $@ ; do
 		echo "---------------- $USERID ----------------"
 		adduserLDAP $USERID
 		USERDN="dn=uid=$USERID,ou=people,dc=intern"
@@ -132,7 +133,7 @@ case $COMMAND in
 	if [ -r $1 ] ; then
 	    ## We have a file, one user per line.
 	    cat $1 | while read LINE; do
-		if [ ! -z "$LINE" ] && echo $LINE | grep -qv "^#" ; then 
+		if [ ! -z "$LINE" ] && echo $LINE | grep -qv "^#" ; then
 		    USERID=`echo $LINE | awk '{print $1}'`
 		    echo "---------------- $USERID ----------------"
 		    ## re-redirect standard input for kadmin:
@@ -141,7 +142,7 @@ case $COMMAND in
 		fi
 	    done
 	else
-	    echo "Deleting accounts for: \"$@\"" 
+	    echo "Deleting accounts for: \"$@\""
 	    for USERID in $@ ; do
 		echo "---------------- $USERID ----------------"
 		kadmin.local -q "delete_principal $USERID" || true
@@ -155,8 +156,8 @@ case $COMMAND in
 	echo "Scanning all home directories tagged, remove them if older than $MAXAGE_DAYS days:"
 	for DIR in `find $HOME -maxdepth 1 -type d -regextype posix-egrep -regex ".*/rm_[0-9]{8}_[^/]+"` ; do
 	    RMDATE=`echo $DIR | sed "s/.*rm_\([0-9]\{8\}\)_.*/\1/"`
-	    AGE=$(( `date +"%s"`-`date +"%s" -d $RMDATE` )) 
-	    AGE_DAYS=$(( $AGE/24/60/60 )) 
+	    AGE=$(( `date +"%s"`-`date +"%s" -d $RMDATE` ))
+	    AGE_DAYS=$(( $AGE/24/60/60 ))
 	    if [ $AGE -gt $MAXAGE_SEC ] ; then
 		rm -rf $DIR
 		echo "Home directory $DIR purged, $AGE_DAYS days old."
@@ -178,32 +179,45 @@ EOF
 		echo "${MACHINE} will be monitored by munin from now on. "
 	    else
 		echo "$MUNIN_CONFDIR does not exist or machine already present in $MUNIN_CONFDIR/nodes.conf. "
-	    fi		
+	    fi
         done
 	echo
 	;;
     add2dhcp)
-	NAME=$1
 	locHW=`ifconfig -a | grep -o "\w\{2\}:\w\{2\}:\w\{2\}:\w\{2\}:\w\{2\}:\w\{2\}"`
 	allHW=`grep -o "\w\{2\}:\w\{2\}:\w\{2\}:\w\{2\}:\w\{2\}:\w\{2\}" /var/log/syslog | sort -u`
 	for HWaddr in $allHW ; do
 	    if echo $locHW | grep -q $HWaddr ; then
 		echo "Skipping local MAC address: ${HWaddr}"
+		echo
 		continue
-	    elif grep -q $HWaddr $DHCPCONF; then
-		echo "MAC address $HWaddr already in ${DHCPCONF}"
+	    elif grep $HWaddr $DHCPCONF; then
+		echo "--->  MAC address already present in ${DHCPCONF}."
 	    else
-		read -e -n 1 -p "Add ${HWaddr} to ${DHCPCONF} [Y|n]?  " inp
-		inp=${inp:-Y}
-		if [ $inp = "Y" ] || [ $inp = "y" ] ; then
-		    sed -i "0,/\(host ${NAME}.*\) A1:B2:C3:D4:E5:\w\{2\};/s//\1 ${HWaddr};/" ${DHCPCONF}
-		    echo "MAC address $HWaddr added."
-		fi
+		echo "Add ${HWaddr} to ${DHCPCONF}?"
+		read -e -n 1 -p "Choose d (diskless), w (workstation) or press RETURN to ignore [d|w|N]: " inp
+		inp=${inp:-N}
+		case $inp in
+		    d)
+			NAME="diskless"
+			;;
+		    w)
+			NAME="workstation"
+			;;
+		    *)
+			echo "MAC address $HWaddr ignored."
+			echo
+			continue
+			;;
+		esac
+		sed -i "0,/\(host ${NAME}.*\) A1:B2:C3:D4:E5:\w\{2\};/s//\1 ${HWaddr};/" ${DHCPCONF}
+		echo "MAC address $HWaddr added as:"
+		grep $HWaddr ${DHCPCONF}
 	    fi
+	    echo
 	done
 	/etc/init.d/isc-dhcp-server restart
 	;;
-    
     *)
 	usage
 	;;
