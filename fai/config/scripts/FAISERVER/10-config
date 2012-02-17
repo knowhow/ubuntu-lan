@@ -4,7 +4,5 @@ fcopy -r /etc/fai
 
 if [ $FAI_ACTION = "install" ]; then
     fcopy  /etc/dhcp/dhcpd.conf
-    if $FAISETUP ; then
-	fcopy  /etc/rc.local
-    fi
+    fcopy  /etc/rc.local
 fi

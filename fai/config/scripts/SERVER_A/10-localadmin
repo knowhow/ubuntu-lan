@@ -1,6 +1,8 @@
 #!/bin/bash
 
-## Add a local user account:
+## Add a local user account.
+## You need to define USERNAME in class/SERVER_A.var to enable:
+
 if [ ! -z $USERNAME ] && ! $ROOTCMD getent passwd $USERNAME ; then
     $ROOTCMD adduser --disabled-login \
 	--gecos "local system administrator" $USERNAME

@@ -11,12 +11,14 @@ UTC=yes
 TIMEZONE=Europe/Berlin
 
 # Local user and root password for the new installed linux system
-USERNAME="localadmin"
-# Use: 'mkpasswd -Hsha-256 <PASSWORD>' to create the password hash
-# pw is "123":
-ROOTPW='$5$1bCKX.c.x29$jz18.yheofg56Pmjav9GJEQCygrZeju8Fqa3LgV04U2'
+# Leave empty if no local user apart from root is needed.
+USERNAME=""
 
-## All sensible data will end up here (see below): 
+# Use: 'mkpasswd -Hsha-256 <PASSWORD>' to create the password hash
+# pw is "fai":
+ROOTPW='$1$kBnWcO.E$djxB128U7dMkrltJHPf6d1'
+
+## All sensible data will end up here (see below):
 DATADIR=/root/installation/
 
 ## The Kerberos KDC master password in clear text (!).  If undefined
@@ -27,10 +29,6 @@ KDC_MASTER_PW=
 ## text (!!!).  If undefined or empty, a random password will be
 ## created and saved in $DATADIR.
 LDAP_ADMIN_PW=
-
-## Run fai-setup and some other initializations on first boot.  
-## See 'files/etc/rc.local'.
-FAISETUP=true
 
 # MODULESLIST contains modules that will be loaded by the new system,
 # not during installation these modules will be written to /etc/modules
