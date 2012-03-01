@@ -55,11 +55,12 @@ copy_example_DB_CONFIG() {
 init_LDAP () {
     $ROOTCMD rm -f /var/lib/ldap/*
     copy_example_DB_CONFIG /var/lib/ldap
-    
+
     if [ -z $LDAP_ADMIN_PW ] ;  then
 	LDAP_ADMIN_PW=`$ROOTCMD slappasswd -g -h {CLEARTEXT}`
 	PWFILE="$DATADIR/LDAPadminPWD"
 	echo -n $LDAP_ADMIN_PW > $target$PWFILE
+	chmod -v 0600 $target$PWFILE
 	echo "Random LDAP admin password saved in ${PWFILE}."
     fi
     PWFILE="/etc/ldapscripts/ldapscripts.passwd"
@@ -81,9 +82,9 @@ init_LDAP () {
 cn=kdc-service,$KRB_CONT_DN#{HEX}$KDC_SERVICE_PW_HEX
 cn=kadmin-service,$KRB_CONT_DN#{HEX}$KDC_SERVICE_PW_HEX
 EOF
-    
+
   ## bootstrap ldap with passwords inserted:
-    
+
     for ldif in $LDIFS; do
 	if $ROOTCMD cat $ldif | $ROOTCMD sed \
 	    -e "s:@LDAP_ADMIN_PW_HASH@:$LDAP_ADMIN_PW_HASH:" \
@@ -117,6 +118,7 @@ init_KDC() {
 	KDC_MASTER_PW=`$ROOTCMD slappasswd -g -h {CLEARTEXT}`
 	PWFILE="$DATADIR/KDCmasterPWD"
 	echo -n $KDC_MASTER_PW > $target$PWFILE
+	chmod -v 0600 $target$PWFILE
 	echo "Random Kerberos KDC master password saved in ${PWFILE}."
     fi
 

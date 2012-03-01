@@ -85,11 +85,10 @@ deluserLDAP(){
 ##############################
 
 COMMAND=$1
-shift
-
-if [ $# -lt 1 ] && [ $COMMAND != "add2dhcp" ] ; then
+if [ $# -lt 1 ] && [ "$COMMAND" != "add2dhcp" ] ; then
     usage
 fi
+shift
 
 case $COMMAND in
     adduser)
