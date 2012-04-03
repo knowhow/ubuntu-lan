@@ -26,8 +26,8 @@ editfiles:
 
 	{ ${target}/etc/exports
 	  ## kerberized NFS4:
-	  AppendIfNoSuchLine "/srv/nfs4        10.0.0.0/8(sec=krb5p:krb5i,rw,sync,fsid=0,crossmnt,no_subtree_check)"
-	  AppendIfNoSuchLine "/srv/nfs4/home0  10.0.0.0/8(sec=krb5p:krb5i,rw,sync,no_subtree_check)"
+	  AppendIfNoSuchLine "/srv/nfs4        10.0.0.0/8(sec=krb5p:krb5i:sys,rw,sync,fsid=0,crossmnt,no_subtree_check)"
+	  AppendIfNoSuchLine "/srv/nfs4/home0  10.0.0.0/8(sec=krb5p:krb5i:sys,rw,sync,no_subtree_check)"
 	}
 
 	{ ${target}/etc/fstab
