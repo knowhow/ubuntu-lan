@@ -1,3 +1,5 @@
 #!/bin/bash
 
-$ROOTCMD update-alternatives --set x-session-manager /usr/bin/startlxde
+## Uncomment to make LXDE the default desktop:
+
+#$ROOTCMD update-alternatives --set x-session-manager /usr/bin/startlxde

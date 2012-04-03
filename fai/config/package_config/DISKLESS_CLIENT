@@ -2,15 +2,21 @@ PACKAGES aptitude
 nbd-client
 libpam-script
 
+## minimal gnome+lxde desktop:
 lxde
 lxtask
 desktop-base
-
 gnome-session
 gnome-applets
+
+## standard gnome desktop:
 #gnome-desktop-environment
+
+## gnome desktop:
 #gnome
 
+
+## other packages:
 gdm3
 menu
 #arduino
@@ -21,7 +27,7 @@ gnome-screenshot
 iceweasel
 inkscape
 gimp
-openoffice.org  # FIXME libreoffice 
+openoffice.org  # FIXME libreoffice
 krb5-auth-dialog
 
 ## From FAIBASE:
