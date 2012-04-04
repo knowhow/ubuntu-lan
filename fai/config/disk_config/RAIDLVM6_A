@@ -1,12 +1,11 @@
+## RAID1 on two identical disks.
+
 disk_config  disk1
 primary  -  64-256    -  -
 primary  -  64-2096   -  -
 logical  -   0-       -  -
 
-disk_config  disk2
-primary  -  64-256    -  -
-primary  -  64-2096   -  -
-logical  -   0-       -  -
+disk_config  disk2  sameas:disk1
 
 
 disk_config  raid
