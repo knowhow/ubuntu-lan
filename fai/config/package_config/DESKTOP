@@ -16,7 +16,6 @@ gnome-applets
 ## other packages:
 gdm3
 menu
-#arduino
 eog
 evince
 gcalctool
