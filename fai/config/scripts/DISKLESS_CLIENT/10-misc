@@ -1,4 +1,17 @@
 #!/bin/bash
+#
+#  Compare with the corresponding FAIBASE script.
+#
+
+set -e
 
 fcopy -v /etc/resolv.conf
 fcopy -v /etc/hosts
+
+## timezone
+echo $TIMEZONE > $target/etc/timezone
+cp -f /usr/share/zoneinfo/${TIMEZONE} $target/etc/localtime
+
+# create keyboard layout table
+$ROOTCMD bash -c "echo 'console-data console-data/keymap/full select $KEYMAP' | debconf-set-selections"
+$ROOTCMD install-keymap $KEYMAP || true
