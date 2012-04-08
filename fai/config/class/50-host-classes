@@ -6,9 +6,21 @@
 # specific to a given setup.  Use the SERVER_* or CLIENT_* class for
 # all setup-specific details.
 
-## Setup A, a minimalistic setup: 
+##
+##   Setup A
+##   =======
+##
+##   Mainserver variants (cf. wiki documentation):
+##
+##     INT_GATEWAY | EXT_GATEWAY  -->  internal/external gateway
+##
+##     *LVM6_A | *LVM7_A DISKLESS_SERVER  -->  diskless client server
+##
+##     LVM*_A | RAIDLVM*_A  -->  RAID1 (mirroring)
+##
+
 MAINSERVER_A="LVM6_A LOG_SERVER PROXY NTP_SERVER DNS_SERVER NFS_SERVER \
-LDAP_CLIENT LDAP_SERVER KERBEROS_CLIENT KERBEROS_KDC KDC_LDAP SERVER_A"
+LDAP_CLIENT LDAP_SERVER KERBEROS_CLIENT KERBEROS_KDC KDC_LDAP SERVER_A INT_GATEWAY"
 
 WORKSTATION_A="LVM5_A LOG_CLIENT LDAP_CLIENT NFS_CLIENT KERBEROS_CLIENT CLIENT_A"
 
