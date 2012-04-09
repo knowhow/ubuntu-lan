@@ -30,7 +30,10 @@ KDC_MASTER_PW=
 ## created and saved in $DATADIR.
 LDAP_ADMIN_PW=
 
-## Variables that define the network:
+## Variables that define the network.  If you choose the same IP
+## address for mainserver ($MAINSERVER_IPADDR) and gateway ($GATEWAY),
+## the mainserver is configured as gateway to the external network.
+## You'll need two network cards in that case.
 MAINSERVER_IPADDR="10.0.0.1"
 NAMESERVER_IPADDR="10.0.0.1"
 BROADCAST="10.0.255.255"

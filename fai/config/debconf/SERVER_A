@@ -1,2 +1,2 @@
 # Network interfaces on which the DHCP server should listen:
-isc-dhcp-server isc-dhcp-server/interfaces string eth1
+isc-dhcp-server isc-dhcp-server/interfaces string eth0

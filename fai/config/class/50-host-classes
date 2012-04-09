@@ -12,7 +12,8 @@
 ##
 ##   Mainserver variants (cf. wiki documentation):
 ##
-##     INT_GATEWAY | EXT_GATEWAY  -->  internal/external gateway
+##     The network configuration (cf. 'class/SERVER_A.var') determines
+##     if the mainserver acts as gateway to the external network.
 ##
 ##     *LVM6_A | *LVM7_A DISKLESS_SERVER  -->  diskless client server
 ##
@@ -20,7 +21,7 @@
 ##
 
 MAINSERVER_A="LVM6_A LOG_SERVER PROXY NTP_SERVER DNS_SERVER NFS_SERVER \
-LDAP_CLIENT LDAP_SERVER KERBEROS_CLIENT KERBEROS_KDC KDC_LDAP SERVER_A INT_GATEWAY"
+LDAP_CLIENT LDAP_SERVER KERBEROS_CLIENT KERBEROS_KDC KDC_LDAP SERVER_A"
 
 WORKSTATION_A="LVM5_A LOG_CLIENT LDAP_CLIENT NFS_CLIENT KERBEROS_CLIENT CLIENT_A"
 
