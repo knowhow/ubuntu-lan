@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 ## Add a local user account.
 ## You need to define USERNAME in class/SERVER_A.var to enable:
 
@@ -13,3 +15,37 @@ fi
 ## Make debian-lan-scripts available:
 
 fcopy -m root,root,0700 /usr/sbin/debian-lan
+
+if [ $FAI_ACTION != "install" ]; then
+    exit 0
+fi
+
+## Generate '/etc/network/interfaces':
+
+cat > $target/etc/network/interfaces <<EOF
+# The loopback network interface
+auto lo
+iface lo inet loopback
+      dns-search intern
+
+# The internal network interface
+auto eth0
+iface eth0 inet static
+      address   ${MAINSERVER_IPADDR}
+      netmask   ${NETMASK}
+      broadcast ${BROADCAST}
+      gateway   ${GATEWAY}
+EOF
+
+if [ "$MAINSERVER_IPADDR" == "$GATEWAY" ] ; then
+    cat >> $target/etc/network/interfaces <<EOF
+      post-up iptables -t nat -A POSTROUTING -o eth1 -j MASQUERADE
+      ## Uncomment if you use dansguardian:
+      #post-up iptables -t nat -A PREROUTING -i eth0 -p tcp --dport 80 -j REDIRECT --to-port 8080
+
+# The external network interface
+allow-hotplug eth1
+auto eth1
+iface eth1 inet dhcp
+EOF
+fi
