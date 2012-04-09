@@ -30,11 +30,17 @@ KDC_MASTER_PW=
 ## created and saved in $DATADIR.
 LDAP_ADMIN_PW=
 
-## Variables that define the network architecture:
+## Variables that define the network:
 MAINSERVER_IPADDR="10.0.0.1"
-SUBNETMASK="10.0.0.0/16"
+NAMESERVER_IPADDR="10.0.0.1"
 BROADCAST="10.0.255.255"
 GATEWAY="10.0.0.1"
+
+SUBNET="10.0.0.0"
+NETMASK="255.255.0.0"
+SUBNETMASK="10.0.0.0/16"
+RANGE="10.0.1.10 10.0.1.200"  # DHCP range for unknown clients
+
 FAINETMASK="10.0.0.0/24"   # NETMASK for FAI config space access
 
 # MODULESLIST contains modules that will be loaded by the new system,
