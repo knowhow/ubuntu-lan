@@ -30,6 +30,13 @@ KDC_MASTER_PW=
 ## created and saved in $DATADIR.
 LDAP_ADMIN_PW=
 
+## Variables that define the network architecture:
+MAINSERVER_IPADDR="10.0.0.1"
+SUBNETMASK="10.0.0.0/16"
+BROADCAST="10.0.255.255"
+GATEWAY="10.0.0.1"
+FAINETMASK="10.0.0.0/24"   # NETMASK for FAI config space access
+
 # MODULESLIST contains modules that will be loaded by the new system,
 # not during installation these modules will be written to /etc/modules
 # If you need a module during installation, add it to $kernelmodules

@@ -1,11 +1,11 @@
 #!/bin/bash
 #
-# setup the diskless+swap server 
+# setup the diskless+swap server
 #
 
 fcopy -m root,root,0755 /usr/sbin/nbdswapd
 
 $ROOTCMD update-inetd --add "9572 stream tcp nowait nobody /usr/sbin/tcpd /usr/sbin/nbdswapd"
 
-ainsl $target/etc/exports     "/opt  10.0.0.0/8(async,ro,no_subtree_check,no_root_squash)"
+ainsl $target/etc/exports     "/opt              ${SUBNETMASK}(async,ro,no_subtree_check,no_root_squash)"
 ainsl $target/etc/hosts.allow "nbdswapd: ALL: keepalive"

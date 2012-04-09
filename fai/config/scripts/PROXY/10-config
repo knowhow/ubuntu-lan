@@ -8,7 +8,7 @@ control:
 editfiles:
    any::
 	{ ${target}/etc/adzapper.conf
-	  ## Configure adzapper: 
+	  ## Configure adzapper:
 	  ReplaceAll 'ZAP_MODE=""' With 'ZAP_MODE="CLEAR"'
 	}
 
@@ -19,16 +19,16 @@ editfiles:
 	     InsertLine "url_rewrite_program /usr/bin/adzapper.wrapper"
 	  EndGroup
 
-	  ## Comment if dansguardian is used (only allow access from localhost): 
-	  ReplaceAll "#acl localnet src 10.0.0.0/8" With "acl localnet src 10.0.0.0/8"
+	  ## Comment if dansguardian is used (only allow access from localhost):
+	  ReplaceAll "#acl localnet src 10.0.0.0/8" With "acl localnet src ${SUBNETMASK}"
 	  BeginGroupIfNoSuchLine "http_access allow localnet"
 	    LocateLineMatching "http_access allow localhost"
 	    InsertLine "http_access allow localnet"
 	  EndGroup
 	}
 
-## Uncomment if dansguardian is used: 
+## Uncomment if dansguardian is used:
 #	{ ${target}/etc/dansguardian/dansguardian.conf
-#	  ## Configure dansguardian: 
+#	  ## Configure dansguardian:
 #	  ReplaceAll "^UNCONFIGURED" With "#UNCONFIGURED"
 #	}
