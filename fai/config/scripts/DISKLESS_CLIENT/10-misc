@@ -5,8 +5,12 @@
 
 set -e
 
-fcopy -v /etc/resolv.conf
 fcopy -v /etc/hosts
+
+## fetch template and fill in nameserver's IP address:
+fcopy -v /etc/resolv.conf
+IP=`host ns | tail -n 1 | awk '{print $NF}'`
+sed -i "s/NAMESERVER/$IP/" $target/etc/resolv.conf
 
 ## timezone
 echo $TIMEZONE > $target/etc/timezone
