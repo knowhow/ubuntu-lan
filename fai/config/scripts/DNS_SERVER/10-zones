@@ -2,6 +2,111 @@
 #
 set -e
 
-fcopy -r /etc/bind/
+if [ $FAI_ACTION != "install" ]; then
+    exit 0
+fi
 
 ainsl $target/etc/bind/named.conf.local "include \"/etc/bind/localzones\";"
+
+## Generate the DNS configuration.
+## Use variables from corresponding class/*.var file.
+
+cat > $target/etc/bind/db.intern <<EOF
+\$TTL 500
+@               IN      SOA     mainserver.intern. root.postoffice.intern. (
+                                1 ; Serialnumber
+                                3600    ; Refresh
+                                1800    ; Retry
+                                720000  ; Expire
+                                6400 )  ; Minimum TTL
+                        NS      mainserver.intern.
+                        MX      10 mainserver.intern.
+mainserver              A       ${MAINSERVER_IPADDR}
+_ldap._tcp              SRV     100 0 389 mainserver.intern.
+_syslog._udp            SRV     100 0 514 mainserver.intern.
+_kerberos._udp          SRV     100 0 88  mainserver.intern.
+_kerberos-adm._tcp      SRV     100 0 749 mainserver.intern.
+_kpasswd._udp           SRV     100 0 464 mainserver.intern.
+ns                      CNAME   mainserver.intern.
+www                     CNAME   mainserver.intern.
+ntp                     CNAME   mainserver.intern.
+webcache                CNAME   mainserver.intern.
+cfengine                CNAME   mainserver.intern.
+bootps                  CNAME   mainserver.intern.
+homes                   CNAME   mainserver.intern.
+wpad                    CNAME   mainserver.intern.
+db                      CNAME   mainserver.intern.
+backup                  CNAME   mainserver.intern.
+ssh                     CNAME   mainserver.intern.
+ltsp                    CNAME   mainserver.intern.
+domain                  CNAME   mainserver.intern.
+ldap                    CNAME   mainserver.intern.
+kerberos                CNAME   mainserver.intern.
+postoffice              CNAME   mainserver.intern.
+syslog                  CNAME   mainserver.intern.
+faiserver               CNAME   mainserver.intern.
+swapserver              CNAME   mainserver.intern.
+EOF
+
+PREFIX=`echo $SUBNET | cut -d "." --fields=1,2,3`
+
+for i in `seq 50 149` ; do
+    NUM=`printf "%02d" $(($i-50))`
+    IPADDR=$i
+    echo "workstation$NUM           A       $PREFIX.$IPADDR" \
+	>> $target/etc/bind/db.intern
+done
+for i in `seq 150 249` ; do
+    NUM=`printf "%02d" $(($i-150))`
+    IPADDR=$i
+    echo "diskless$NUM              A       $PREFIX.$IPADDR" \
+	>> $target/etc/bind/db.intern
+done
+
+###################
+
+PREFIX=`echo $SUBNET | cut -d "." --fields=1,2`
+FILE="/etc/bind/db.$PREFIX.in-addr.arpa"
+
+cat > $target/etc/bind/localzones <<EOF
+zone "${PREFIX}.in-addr.arpa" {
+        type master;
+        notify yes;
+        file "$FILE";
+};
+
+zone "intern" {
+        type master;
+        notify yes;
+        file "/etc/bind/db.intern";
+};
+EOF
+
+###################
+
+REV=`echo $MAINSERVER_IPADDR | cut -d "." --fields=4`
+
+cat > $target$FILE <<EOF
+\$TTL 500
+@               IN      SOA     mainserver.intern. root.postoffice.intern. (
+                                1 ; Serialnumber
+                                3600    ; Refresh
+                                1800    ; Retry
+                                720000  ; Expire
+                                6400 )  ; Minimum TTL
+                        NS      mainserver.intern.
+                        MX      10 mainserver.intern.
+$REV.0                    PTR     mainserver.intern.
+EOF
+for i in `seq 50 149` ; do
+    NUM=`printf "%02d" $(($i-50))`
+    IPADDR=$i
+    echo "${IPADDR}.0                    PTR     workstation${NUM}.intern." \
+	>> $target$FILE
+done
+for i in `seq 150 249` ; do
+    NUM=`printf "%02d" $(($i-150))`
+    IPADDR=$i
+    echo "${IPADDR}.0                   PTR     diskless${NUM}.intern." \
+	>> $target$FILE
+done
