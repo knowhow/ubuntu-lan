@@ -35,16 +35,24 @@ LDAP_ADMIN_PW=
 ## the mainserver is configured as gateway to the external network.
 ## You'll need two network cards in that case.
 MAINSERVER_IPADDR="10.0.0.1"
-NAMESERVER_IPADDR="10.0.0.1"
-BROADCAST="10.0.255.255"
 GATEWAY="10.0.0.1"
+BROADCAST="10.0.255.255"
+NAMESERVER_IPADDR=""  # leave empty to use mainserver's IP address
 
 SUBNET="10.0.0.0"
 NETMASK="255.255.0.0"
 SUBNETMASK="10.0.0.0/16"
-RANGE="10.0.1.10 10.0.1.200"  # DHCP range for unknown clients
 
-FAINETMASK="10.0.0.0/24"   # NETMASK for FAI config space access
+## NETMASK for FAI config space access:
+FAINETMASK="10.0.0.0/24"
+
+## DHCP range for unknown clients (cf. dhcpd.conf):
+RANGE="10.0.1.10 10.0.1.200"
+
+## IP address-endings for workstations and diskless machines (the list
+## is generated using 'seq $WS_RANGE' respectively 'seq $DL_RANGE'):
+WS_RANGE="50 149"
+DL_RANGE="150 249"
 
 # MODULESLIST contains modules that will be loaded by the new system,
 # not during installation these modules will be written to /etc/modules

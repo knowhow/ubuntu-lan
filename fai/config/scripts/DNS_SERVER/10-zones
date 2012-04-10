@@ -50,17 +50,19 @@ EOF
 
 PREFIX=`echo $SUBNET | cut -d "." --fields=1,2,3`
 
-for i in `seq 50 149` ; do
-    NUM=`printf "%02d" $(($i-50))`
-    IPADDR=$i
-    echo "workstation$NUM           A       $PREFIX.$IPADDR" \
+NUM=0
+for IPADDR in `seq $WS_RANGE` ; do
+    NUMSTR=`printf "%02d" $NUM`
+    echo "workstation${NUMSTR}           A       $PREFIX.$IPADDR" \
 	>> $target/etc/bind/db.intern
+    NUM=$(($NUM+1))
 done
-for i in `seq 150 249` ; do
-    NUM=`printf "%02d" $(($i-150))`
-    IPADDR=$i
-    echo "diskless$NUM              A       $PREFIX.$IPADDR" \
+NUM=0
+for IPADDR in `seq $DL_RANGE` ; do
+    NUMSTR=`printf "%02d" $NUM`
+    echo "diskless${NUMSTR}              A       $PREFIX.$IPADDR" \
 	>> $target/etc/bind/db.intern
+    NUM=$(($NUM+1))
 done
 
 ###################
@@ -98,15 +100,17 @@ cat > $target$FILE <<EOF
                         MX      10 mainserver.intern.
 $REV.0                    PTR     mainserver.intern.
 EOF
-for i in `seq 50 149` ; do
-    NUM=`printf "%02d" $(($i-50))`
-    IPADDR=$i
-    echo "${IPADDR}.0                    PTR     workstation${NUM}.intern." \
+NUM=0
+for IPADDR in `seq $WS_RANGE` ; do
+    NUMSTR=`printf "%02d" $NUM`
+    echo "${IPADDR}.0                    PTR     workstation${NUMSTR}.intern." \
 	>> $target$FILE
+    NUM=$(($NUM+1))
 done
-for i in `seq 150 249` ; do
-    NUM=`printf "%02d" $(($i-150))`
-    IPADDR=$i
-    echo "${IPADDR}.0                   PTR     diskless${NUM}.intern." \
+NUM=0
+for IPADDR in `seq $DL_RANGE` ; do
+    NUMSTR=`printf "%02d" $NUM`
+    echo "${IPADDR}.0                    PTR     diskless${NUMSTR}.intern." \
 	>> $target$FILE
+    NUM=$(($NUM+1))
 done
