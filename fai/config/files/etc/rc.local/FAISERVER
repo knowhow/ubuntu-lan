@@ -3,17 +3,18 @@
 set -e
 
 ## Setup script run at boot time.
-## Removed after successful execution. 
+## Removed after successful execution.
 
 ############################
-# Remove to enable: 
-echo
-echo "====================================================================="
-echo "The nfsroot for FAI may be created by executing $0."
-echo "This can be done at boot time or manually."
-echo "To enable, remove the lines marked in $0 and"
-echo "reboot or execute $0."
-echo "====================================================================="
+# Remove to enable:
+cat <<EOF
+=====================================================================
+The nfsroot for FAI may be created by executing $0.
+This can be done at boot time or manually.
+To enable, remove the lines marked in $0 and
+reboot or execute $0.
+=====================================================================
+EOF
 exit 0
 ###########################
 
@@ -22,21 +23,28 @@ echo "Creating the nfsroot for FAI."
 . /etc/fai/fai.conf
 . /etc/fai/make-fai-nfsroot.conf
 
-if [ ! -d "$FAI_CONFIGDIR/class" ]; then
+if [ ! -d "$FAI_CONFIGDIR/class" ] ; then
     mkdir -p $FAI_CONFIGDIR
     cp -a /usr/share/doc/fai-doc/examples/simple/* $FAI_CONFIGDIR
 fi
 
 URL=`echo $FAI_DEBOOTSTRAP | awk '{print $2}'`
-## Check if package repository is accessible:     
+## Check if package repository is accessible:
 if wget --quiet --output-document=/tmp/fai-setup $URL ; then
     fai-setup -e -v
-    ## Create pxelinux boot configuration for workstation*:
-    for i in `seq 0 9` ; do
-	for j in `seq 0 9` ; do
-	    fai-chboot -IFv workstation$i$j  2>&1 | tee /var/log/fai/fai-chboot.log 
-	done
+    ## Create pxelinux boot configuration for workstationXX.
+    ## The seq range is sed from the corresponding variable
+    ## when fcopy'd:
+    NUM=0
+    for i in `seq WS_RANGE` ; do
+	NUMSTR=`printf "%02d" $NUM`
+	fai-chboot -IFv workstation$NUMSTR  2>&1 | tee -a /var/log/fai/fai-chboot.log
+	NUM=$(($NUM+1))
     done
     ## remove me, things are prepared now:
     mv -v /etc/rc.local.pre_fcopy $0
+
+    ## The following message is sed for diskless servers when fcopy'd:
+    #DISKLESS_INFO
+
 fi

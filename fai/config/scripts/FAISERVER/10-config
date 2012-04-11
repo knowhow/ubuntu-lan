@@ -5,5 +5,20 @@ set -e
 fcopy -r /etc/fai
 
 if [ $FAI_ACTION == "install" ]; then
+    ## fetch template and seed 'number' of workstations:
     fcopy  /etc/rc.local
+    sed -i "s/WS_RANGE/$WS_RANGE/" $target/etc/rc.local
+
+    if ifclass DISKLESS_SERVER ; then
+	sed -i "s/\#DISKLESS_INFO/\
+cat <<EOF\n\
+==============================================================\n\
+To install the chroot for diskless clients execute:           \n\n\
+    export LC_ALL=C                                           \n\
+    fai -vNu diskless dirinstall \/opt\/live\/filesystem.dir\/\n\n\
+You can do this right now or later.                           \n\
+==============================================================\n\
+EOF/" \
+	    $target/etc/rc.local
+    fi
 fi
