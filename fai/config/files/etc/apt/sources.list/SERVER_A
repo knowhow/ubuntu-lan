@@ -1,3 +1,6 @@
 deb http://mainserver:3142/cdn.debian.net/debian/ squeeze main
 deb http://mainserver:3142/security.debian.org/ stable/updates main
 deb http://mainserver:3142/ftp.debian.org/debian/ squeeze-updates main
+
+## Backports repository:
+#deb http://backports.debian.org/debian-backports squeeze-backports main
