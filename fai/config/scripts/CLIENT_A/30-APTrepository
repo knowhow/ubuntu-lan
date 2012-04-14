@@ -13,9 +13,12 @@ echo "Check if public key is available:"
 if $ROOTCMD wget -O /tmp/DebianLAN.pubkey $APT_URL/DebianLAN.pubkey ; then
     echo -n "Run apt-key and add key: "
     $ROOTCMD apt-key add /tmp/DebianLAN.pubkey
-    ## Key is available, add repository to sources.list:
-    $ROOTCMD ainsl $target/etc/apt/sources.list "## Local APT repository for site-specific packages:"
-    $ROOTCMD ainsl $target/etc/apt/sources.list "deb $APT_URL stable main"
+    ## Key is available, add repository to sources.list.
+    ## Use apt-cacher-ng to serve packages.  This avoids
+    ## potential conflicts with a web filter:
+    ACNG_URL=`echo $APT_URL | sed "s%mainserver%mainserver:3142\/mainserver%"`
+    ainsl $target/etc/apt/sources.list "## Local APT repository for site-specific packages:"
+    ainsl $target/etc/apt/sources.list "deb $ACNG_URL stable main"
 else
     echo "No key available."
 fi

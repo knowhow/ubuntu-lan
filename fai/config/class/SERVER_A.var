@@ -56,7 +56,7 @@ DL_RANGE="150 249"
 
 ## Local APT repository for the site (accessible via http).
 ## Set empty to skip this feature.
-APT_REPO_DIR="/var/www/debian"
+APT_REPO_DIR="/var/www/debian/"
 
 # MODULESLIST contains modules that will be loaded by the new system,
 # not during installation these modules will be written to /etc/modules
