@@ -1,6 +1,13 @@
 PACKAGES aptitude
 
-ubuntu-desktop
+## minimal gnome+lxde desktop:
+lubuntu-core
+
+## standard gnome desktop:
+#gnome-desktop-environment
+
+## gnome desktop:
+#gnome
 
 ## other packages:
 #gdm3
@@ -9,6 +16,7 @@ ubuntu-desktop
 evince
 gcalctool
 #gnome-screenshot
+#iceweasel
 inkscape
 gimp
 anacron

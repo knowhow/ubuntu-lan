@@ -37,8 +37,11 @@ case $HOSTNAME in
 	echo "FAIBASE DEMO FAISERVER" ;;
     demohost)
 	echo "FAIBASE DHCPC DEMO" ;;
-    gnomehost)
-	echo "FAIBASE DHCPC DEMO XORG GNOME";;
+    ubuntuhost)
+	echo "FAIBASE DHCPC DEMO XORG DESKTOP";;
+    lubuntuhost)
+	echo "FAIBASE DHCPC DEMO XORG LDESKTOP";;
+
     atom*)
 	echo "FAIBASE DHCPC DEMO" ;;
     bear)
