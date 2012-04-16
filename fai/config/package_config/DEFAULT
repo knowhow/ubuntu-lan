@@ -1,12 +1,12 @@
 PACKAGES aptitude-r I386
-linux-image
+linux-image-server
 memtest86+
 
 PACKAGES aptitude CHROOT
-linux-image-
+linux-image-server
 
 PACKAGES aptitude-r AMD64
-linux-image
+linux-image-server
 memtest86+
 
 PACKAGES aptitude XEN
@@ -15,11 +15,6 @@ xen-hypervisor-amd64
 PACKAGES aptitude DHCPC
 isc-dhcp-client
 
-PACKAGES aptitude GRUB
-grub lilo-
-
 PACKAGES aptitude GRUB_PC
 grub-pc grub- lilo-
 
-PACKAGES aptitude LILO
-lilo grub-

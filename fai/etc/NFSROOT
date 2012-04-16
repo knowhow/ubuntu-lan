@@ -14,11 +14,11 @@ cfengine2 libapt-pkg-perl
 # architecture dependend list of packages that are installed
 
 PACKAGES aptitude I386
-grub-pc lilo read-edid
-linux-image
+grub-pc read-edid
+linux-image-server
 
 PACKAGES aptitude AMD64
-grub-pc lilo
-linux-image
+grub-pc
+linux-image-server
 
 
