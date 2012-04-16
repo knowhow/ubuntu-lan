@@ -1,11 +1,10 @@
-# example of new config file for setup-storage
-#
-# <type> <mountpoint> <size>   <fs type> <mount options> <misc options>
 disk_config  disk1  disklabel:bout fstabkey:uuid bootable:1
+
 primary  /boot       256M-512M   ext2    rw
 logical  -           0-          -       -
 
 disk_config lvm
+
 vg  vg_system  disk1.5
 vg_system-swap  swap      500M-4G  swap  sw 
 vg_system-root  /         4G-         ext4  rw,noatime,errors=remount-ro
