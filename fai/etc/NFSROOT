@@ -1,0 +1,24 @@
+PACKAGES aptitude
+nfs-common fai-nfsroot module-init-tools ssh rdate lshw portmap
+rsync lftp less dump reiserfsprogs e2fsprogs usbutils
+hwinfo psmisc pciutils hdparm smartmontools parted mdadm lvm2
+dnsutils ntpdate dosfstools jove xfsprogs xfsdump
+procinfo dialog discover
+console-setup console-common
+iproute udev subversion liblinux-lvm-perl
+
+# needed for the simple examples
+cfengine2 libapt-pkg-perl
+
+# you should not edit the lines below
+# architecture dependend list of packages that are installed
+
+PACKAGES aptitude I386
+grub-pc lilo read-edid
+linux-image-server
+
+PACKAGES aptitude AMD64
+grub-pc lilo
+linux-image-server
+
+
