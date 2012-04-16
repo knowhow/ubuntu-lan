@@ -15,10 +15,10 @@ cfengine2 libapt-pkg-perl
 
 PACKAGES aptitude I386
 grub-pc lilo read-edid
-linux-image-server
+linux-image
 
 PACKAGES aptitude AMD64
 grub-pc lilo
-linux-image-server
+linux-image
 
 
