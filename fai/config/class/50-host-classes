@@ -34,7 +34,8 @@ MAINSERVER_B="NTP_SERVER DNS_SERVER LDAP_SERVER KERBEROS_KDC SETUP_B"
 # Use a list of classes for your machine:
 case $HOSTNAME in
     faiserver)
-	echo "FAIBASE DEMO FAISERVER" ;;
+	#echo "FAIBASE DEMO FAISERVER" ;;
+        echo "UBUNTU_BASE" ;;
     demohost)
 	echo "FAIBASE DHCPC DEMO" ;;
     ubuntuhost)
