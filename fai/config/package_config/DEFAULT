@@ -1,13 +1,12 @@
 PACKAGES aptitude-r I386
-linux-image-generic
+linux-image
 memtest86+
 
 PACKAGES aptitude CHROOT
-linux-image-generic-
-linux-image-amd64-
+linux-image-
 
 PACKAGES aptitude-r AMD64
-linux-image-generic
+linux-image
 memtest86+
 
 PACKAGES aptitude XEN
