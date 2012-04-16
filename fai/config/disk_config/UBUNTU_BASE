@@ -1,5 +1,4 @@
-disk_config  disk1  disklabel:bout fstabkey:uuid bootable:1
-
+disk_config disk1 fstabkey:uuid bootable:1
 primary  /boot       256M-512M   ext2    rw
 logical  -           0-          -       -
 
